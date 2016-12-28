@@ -1,0 +1,70 @@
+2016-11-29
+ant design + react
+在class中定义方法
+add = () => {}
+与
+add() {}
+两种定义的区别是什么？
+为什么用class DynamicFieldSet extends React.Component {}的方式定义class，里面
+ handleSubmit = (e) => {
+	this.props //this正常
+ }
+ handleSubmit(e) {
+	this.props //this为null
+ }
+ 
+而采用
+let PlugSubmitForm = React.createClass({json串})方式定义class，里面用
+handleSubmit(e) {
+
+ },
+ handleSubmit: function(e) {
+	
+ }
+ 两种混合都可以在handleSubmit得到this
+ 
+数据库mapping时
+ @Options(useGeneratedKeys = true, keyProperty = "id")
+ 报错
+mysql对应的表auto increase要勾上
+
+
+
+2016-11-30
+传统html input可以设置name相同的input，后台通过数组接收
+react有类似的吗？
+<input name="sendMethod" value="1" />
+<input name="sendMethod" value="2" />
+后台String[] sendMethod
+
+通过转成读json转数组来实现
+
+最新的一行后加加号是不太合理，情况：用户想删除刚新增的，是做不到的。antd页面示例比较合理
+
+EventPool在实际应用中的意义是什么？
+
+2016-12-02
+参考最新版本的ant design，使用Form时遇到两个问题
+1，没有form.getFieldDecorator，使用getFieldProps绑定表单项的rule和name。
+2,Form标签中不加form={this.props.form}会导致表单验证不显示提示。查1.11.1版本的文档得知1.7.0以后的版本不用加这句属性。
+
+2016-12-5
+版本react15.0.0，子节点在componentWillMount方法中通过this.props取父节点的数据，再通过setState设置到state中供自己访问。当父节点更新props时，子节点不会自动更新。
+解决办法，在子节点中直接访问props，而不是先读props的date然后setState，再访问state。
+
+2016-12-8
+ant design:
+Row Col的布局不能像html的table那样嵌套使用
+RadioGroup和Radio之间不能有别的标签。布局不好控制
+
+2016-12-23
+angularjs不知道如何像react那样，打包成1个js在后台index.vm页面引用。开发时也不知道如何配合后台使用。
+找个像webpack那样的工具就可以。有空试试
+
+sublime react插件，编辑js文件时，html代码可能<>不能正常匹配，导致高亮出错，jsx没有问题。
+
+2016-12-27
+线上调试工具
+http://demo.nwux.taobao.net/
+
+

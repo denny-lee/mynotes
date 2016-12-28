@@ -1,0 +1,140 @@
+2016-12-22
+新建一个web项目
+使用maven,spring-boot,mybatis,mysql,angularjs
+初始化
+使用maven
+mvn archetype:generate
+-DgroupId 自己定义
+-DartifactId 自己定义
+-Dversion 自己定义
+-Dpackage 自己定义
+-DarchetypeArtifactId
+-DarchetypeGroupId
+-DarchetypeVersion 1.7
+-DinteractiveMode 交互模式 
+后来没用到，找不到对应的demo的artifactId和groupId
+用spring的项目初始化页面，生成了一个demo项目目录结构
+
+2016-12-23
+pom引入freemarker
+spring-boot内建了配置，直接把模板放在classpath:template下就可以取到。
+本来要用velocity，但spring4.3中velocity已弃用。
+
+angularjs不知道如何像react那样，打包成1个js在后台index.vm页面引用。开发时也不知道如何配合后台使用。
+因此改用react
+npm install -g create-react-app
+create-react-app hello-world   初始一个新的项目
+cd hello-world
+npm start
+
+
+引入mysql和mybatis:
+<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+	    <dependency>
+		    <groupId>org.mybatis.spring.boot</groupId>
+		    <artifactId>mybatis-spring-boot-starter</artifactId>
+		    <version>1.1.1</version>
+		</dependency>
+在application.properties中加入：
+spring.datasource.url=jdbc:mysql://localhost/knowledge?characterEncoding=UTF8&useSSL=true&verifyServerCertificate=false
+spring.datasource.username=root
+spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+
+创建mapper,interface，就可以直接注入
+@Mapper
+public interface TestMapper {
+	
+	@Insert("insert into snippet(content,tag,gmt_create) values(#{content},#{tag},NOW())")
+    boolean save(Snippet snippet);
+	
+	@Delete("delete from snippet")
+    boolean delete();
+	
+}
+
+汉字乱码
+在my.ini加参数 
+character-set-server=utf8
+collation-server=utf8_general_ci
+
+启动报SSL验证告警，在jdbc连接url加如下：
+useSSL=true&verifyServerCertificate=false
+
+
+2016-12-26
+引入react
+使用npm
+开发时不知道如何引入 
+build后，把生成的静态文件放在后台项目static目录下，可以在index页面引入/js/index.js/index
+
+改用tnpm，加入依赖
+"dependencies": {
+    "babel-plugin-transform-runtime": "^6.8.0",
+    "babel-runtime": "^6.18.0",
+    "classnames": "^2.2.5",
+    "history": "2.0.1",
+    "jquery": "^3.1.0",
+    "object-assign": "~3.0.0",
+    "rc-queue-anim": "^0.11.9",
+    "react": "^15.0.0",
+    "react-dom": "^15.0.0",
+    "react-intl": "^2.0.0",
+    "react-router": "^2.0.0",
+    "site": "^1.3.0"
+  },
+  "devDependencies": {
+    "atool-build": "0.6.x",
+    "babel-cli": "^6.4.0",
+    "babel-core": "6.3.26",
+    "babel-eslint": "~4.0.5",
+    "babel-loader": "6.2.0",
+    "babel-plugin-antd": "0.2.x",
+    "babel-plugin-react-intl": "^2.0.0",
+    "babel-preset-es2015": "^6.3.13",
+    "babel-preset-react": "^6.11.1",
+    "babel-preset-stage-0": "^6.3.13",
+    "dora": "0.3.x",
+    "dora-plugin-proxy": "0.6.x",
+    "dora-plugin-webpack": "0.5.x",
+    "es3ify-loader": "~0.1.0",
+    "eslint": "~1.10.3",
+    "eslint-config-airbnb": "~2.0.0",
+    "eslint-plugin-react": "~3.5.1",
+    "history": "2.0.1",
+    "imports-loader": "^0.6.5",
+    "rc-queue-anim": "0.11.9",
+    "rc-tree": "1.1.6",
+    "react-sidenav": "^1.0.4",
+    "url-loader": "^0.5.7"
+  },
+  "scripts": {
+    "dev": "dora --plugins proxy,webpack",
+    "lint": "eslint --ext .js,.jsx src",
+    "build": "atool-build -o ./dist/${npm_package_family}/${npm_package_name}/${npm_package_version}",
+    "validate": "npm ls"
+  }
+  
+可以开发引入后台index.ftl页面，注意
+<script src="http://127.0.0.1:8989/common.js"></script>
+<script src="http://127.0.0.1:8989/index.js"></script>
+<link rel="stylesheet" type="text/css" href="http://127.0.0.1:8989/index.css"/>
+ 
+tnpm run dev开发
+tnpm run build 打包
+
+tnpm是npm在中国的镜像库。快
+当run dev时dora的webpack插件提供出index.css，index.js,common.js
+
+dora:dora来自ant-tool 是一个开发服务器，通过插件的方式集合各种调试方案，比如 webpack、livereload、browsersync、数据 mock、本地代理、weinre、jsonapi 等等。
+webpack: 一个module bundler，把一堆有依赖关系的js,css,png变成一个js,css,png
+
+--------------
+选择一个前端框架，uxcore

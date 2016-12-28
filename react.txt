@@ -1,0 +1,43 @@
+2016-11-28
+antd + react
+层级之间传递数据的方式：
+1，用props（上向下），callback（下向上）
+2，使用EventPool
+3，使用Redux，功能比较复杂
+
+
+React是一个庞大的前端框架，局部刷新DOM，大数据加载很强大。由Facebook开发
+
+npm一个javaScript package Manager.
+
+node.js 一个javaScript运行时
+
+ECMAScript = javaScript
+ECMAScript2015 = ES6
+
+ant design 蚂蚁金服开发
+
+dva
+
+webpack
+
+babel
+
+eslint
+
+dora
+
+atool-build
+
+Redux
+
+() => {}这种定义函数的方式与function() {}的方式的一个重要区别是前者不绑定function的this.
+通过React.createClass({json});的方式创建class时，{add() {}}也同样不会绑定function的this.
+
+arr.map(key, index) {}
+arr.slice()
+Object.assign();
+...{}
+keys.filter(key => key !== k)
+
+

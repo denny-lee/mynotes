@@ -1,0 +1,189 @@
+2016-12-20
+Angularjs
+
+ng-app开始元素
+
+{{表达式}}
+
+
+There are 3 important things that happen during the bootstrap phase:
+
+The injector that will be used for dependency injection is created.
+
+The injector will then create the root scope that will become the context for the model of our application.
+
+Angular will then "compile" the DOM starting at the ngApp root element, processing any directives and bindings found along the way.
+
+
+
+index.html
+<html ng-app="phonecatApp">
+<body ng-controller="PhoneListController">
+    <li ng-repeat="phone in phones">
+      <span>{{phone.name}}</span>
+      <p>{{phone.snippet}}</p>
+    </li>
+  </ul>
+  
+  
+app.js
+// Define the `phonecatApp` module
+var phonecatApp = angular.module('phonecatApp', []);
+
+// Define the `PhoneListController` controller on the `phonecatApp` module
+phonecatApp.controller('PhoneListController', function PhoneListController($scope) {
+  $scope.phones = [
+    {
+      name: 'Nexus S',
+      snippet: 'Fast just got faster with Nexus S.'
+    }, {
+      name: 'Motorola XOOM? with Wi-Fi',
+      snippet: 'The Next, Next Generation tablet.'
+    }, {
+      name: 'MOTOROLA XOOM?',
+      snippet: 'The Next, Next Generation tablet.'
+    }
+  ];
+});
+
+
+
+Component中引用this, $ctrl
+By default, components use $ctrl as the controller alias, but we can override it, should the need arise.
+
+
+
+
+app/index.html:
+
+<html ng-app="phonecatApp">
+<head>
+  ...
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="app.js"></script>
+  <script src="phone-list.component.js"></script>
+</head>
+<body>
+
+  <!-- Use a custom component to render a list of phones -->
+  <phone-list></phone-list>
+
+</body>
+</html>
+
+app/app.js:
+
+// Define the `phonecatApp` module
+angular.module('phonecatApp', []);
+
+app/phone-list.component.js:
+
+// Register `phoneList` component, along with its associated controller and template
+angular.
+  module('phonecatApp').
+  component('phoneList', {
+    template:
+        '<ul>' +
+          '<li ng-repeat="phone in $ctrl.phones">' +
+            '<span>{{phone.name}}</span>' +
+            '<p>{{phone.snippet}}</p>' +
+          '</li>' +
+        '</ul>',
+    controller: function PhoneListController() {
+      this.phones = [
+        {
+          name: 'Nexus S',
+          snippet: 'Fast just got faster with Nexus S.'
+        }, {
+          name: 'Motorola XOOM? with Wi-Fi',
+          snippet: 'The Next, Next Generation tablet.'
+        }, {
+          name: 'MOTOROLA XOOM?',
+          snippet: 'The Next, Next Generation tablet.'
+        }
+      ];
+    }
+  });
+  
+  
+  
+Organise Code , Make project expandable
+
+To that end, we will explain why and how we:
+
+Put each entity in its own file.
+Organize our code by feature area, instead of by function.
+Split our code into modules that other modules can depend on.
+
+1,One Feature per File
+2,Organizing by Feature
+3,Using Modules
+
+Example:
+app/
+  phone-list/
+    phone-list.component.js
+    phone-list.component.spec.js
+    phone-list.module.js
+    phone-list.template.html
+  app.css
+  app.module.js
+  index.html
+
+  
+  
+双向绑定：
+ Sort by:
+        <select ng-model="$ctrl.orderProp">
+          <option value="name">Alphabetical</option>
+          <option value="age">Newest</option>
+        </select>
+		
+<li ng-repeat="phone in $ctrl.phones | filter:$ctrl.query | orderBy:$ctrl.orderProp">
+          <span>{{phone.name}}</span>
+          <p>{{phone.snippet}}</p>
+        </li>
+		
+		
+		
+Angular build-in service $http
+read json file
+
+angular.
+  module('phoneList').
+  component('phoneList', {
+    templateUrl: 'phone-list/phone-list.template.html',
+    controller: function PhoneListController($http) {
+      var self = this;
+      self.orderProp = 'age';
+
+      $http.get('phones/phones.json').then(function(response) {
+        self.phones = response.data;
+      });
+    }
+  });
+  
+命名时避免使用$，与内建的服务冲突
+
+
+
+bower.json:管理依赖
+
+
+依赖注入原理
+The injector only carries out the following steps:
+
+Load the module definition(s) that you specify in your application.
+Register all Providers defined in these module definition(s).
+When asked to do so, lazily instantiate services and their dependencies, via their Providers, as parameters to an injectable function.
+
+两种注入：
+1.
+function PhoneListController($http) {...}
+PhoneListController.$inject = ['$http'];
+...
+.component('phoneList', {..., controller: PhoneListController});
+2.
+function PhoneListController($http) {...}
+...
+.component('phoneList', {..., controller: ['$http', PhoneListController]});

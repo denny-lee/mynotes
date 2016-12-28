@@ -1,0 +1,5 @@
+reactjs高亮：
+安装package control
+安装babel这个package
+View->Syntax
+

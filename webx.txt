@@ -1,0 +1,80 @@
+2016-12-19
+
+mvn archetype:generate -DgroupId=com.alibaba.webx -DartifactId=tutorial1 -Dversion=1.0-SNAPSHOT -Dpackage=com.alibaba.webx.tutorial1 -DarchetypeArtifactId=archetype-webx-quickstart -DarchetypeGroupId=com.alibaba.citrus.sample -DarchetypeVersion=1.7 -DinteractiveMode=false
+
+假设用户以URL：http://localhost:8081/来访问Webx应用。Webx Framework的处理流程，从WebxFrameworkFilter接收请求，并且一路顺利到达pipeline。
+然后Pipeline开始依次执行它的valves。
+
+1.
+<analyzeURL> - 分析URL
+
+分析URL的目的是取得target。
+http://localhost:8081/对应的target为“homepage”。
+target不代表模板名，也不代表类名。Target只是一个抽象的概念 —— 当前页面需要达成的目标。Target可能被后续的valves解释成模板名、类名或者其它东西。
+
+2.
+进入<choose> - 多重分支
+3.
+<performAction> - 执行action
+和其它框架中的action概念不同，在Webx Turbine中，action是用来处理用户提交的表单的。
+因为本次请求未提供action参数，所以跳过该步骤。
+4.
+<performTemplateScreen> - 查找并执行screen。
+
+这里要用到一个规则：target映射成screen module类名的规则。
+
+假设target为xxx/yyy/zzz，那么Webx Turbine会依次查找下面的screen模块：
+
+screen.xxx.yyy.Zzz，
+
+screen.xxx.yyy.Default，
+
+screen.xxx.Default，
+
+screen.Default。
+本次请求的target为homepage，因此它会尝试查找screen.Homepage和screen.Default这两个类。
+
+5.
+<renderTemplate> - 渲染模板
+这里用到两个规则：target映射成screen template，以及target映射成layout template。
+
+假设target为xxx/yyy/zzz，那么Webx Turbine会查找下面的screen模板：/templates/screen/xxx/yyy/zzz。Screen模板如果未找到，就会报404 Not Found错误。 找到screen模板以后，Webx Turbine还会试着查找下面的layout模板：
+
+/templates/layout/xxx/yyy/zzz
+
+/templates/layout/xxx/yyy/default
+
+/templates/layout/xxx/default
+
+/templates/layout/default
+
+Layout模板如果找不到，就直接渲染screen模板；如果存在，则把渲染screen模板后的结果，嵌入到layout模板中。
+
+Layout模板和screen模板中，都可以调用control。每个页面只有一个screen，却可以有任意多个controls。
+
+6.
+<breakUnlessTargetRedirected> - 内部重定向
+
+在screen和action中，可以进行“内部重定向”。内部重定向实质上就是由<breakUnlessTargetRedirected>实施的 —— 如果没有重定向标记，就退出；否则循环到<loop>标签。
+
+----
+在使用Spring原生注入手段时，需要注意beans的scope。你只能注入相同scope或较大的scope中的bean。例如，screen/action/control的scope为singleton，因此用@Autowired注入时，只能注入singleton的对象，不能注入诸如request、session等较小的scope对象。
+前面我们刚讲过，你不能把request scope的对象，注入到singleton scope的对象中。但在Webx中，你可以将HttpServletRequest、HttpServletResponse和HttpSession对象注入到singleton对象中。为什么呢？原来，<request-contexts>对这几个常用对象进行了特殊处理，将它们转化成了singleton对象。
+
+
+
+
+#escape("xml")是什么？
+$app1Link是什么？在uris里配置的东西，可以在vm和action中用
+$rundata是什么？好像是web-component.xml里引入的，在pipeline.xml中准备
+<!-- 初始化turbine rundata，并在pipelineContext中设置可能会用到的对象(如rundata、utils)，以便valve取得。 -->
+        <pl-valves:prepareForTurbine />
+<!-- 将beans暴露给模板。 -->
+    <services:pull>
+        <pull-factories:utils />
+        <pull-factories:rundata-tool />
+        <pull-factories:csrfToken />
+        <pull-factories:form-tool />
+        <pull-factories:control-tool />
+        <pull-factories:uris-tool />
+    </services:pull>

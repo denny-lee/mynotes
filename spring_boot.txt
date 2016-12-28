@@ -1,0 +1,4 @@
+2016-12-23
+Spring-boot
+@RestController与@Controller区别：
+前者不用在方法前加@ResponseBody自动返回json。后者要加。不加就返回View

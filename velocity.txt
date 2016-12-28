@@ -1,0 +1,128 @@
+2016-12-20
+Velocity
+
+Variables
+
+Notation:
+
+$ [ ! ][ { ][a..z, A..Z ][ a..z, A..Z, 0..9, -, _ ][ } ]
+
+Examples:
+
+Shorthand notation: $mud-Slinger_9
+Silent Shorthand notation: $!mud-Slinger_9
+Formal notation: ${mud-Slinger_9}
+Silent Formal notation: $!{mud-Slinger_9}
+
+
+Properties
+
+Notation:
+
+$ [ { ][ a..z, A..Z ][ a..z, A..Z, 0..9, -, _ ] .[a..z, A..Z ][a..z, A-Z, 0..9, -, _ ] [ } ]
+
+Examples:
+
+Regular Notation: $customer.Address
+Formal Notation: ${purchase.Total}
+Methods
+
+Notation:
+
+$ [ { ][ a..z, A..Z ][ a..z, A..Z, 0..9, -, _ ] .[ a..z, A..Z ][a..z, A..Z, 0..9, -, _ ]( [optional parameter list...* ] ) [ } *]
+
+Examples:
+
+Regular Notation: $customer.getAddress()
+Formal Notation: ${purchase.getTotal()}
+Regular Notation with Parameter List: $page.setTitle( "My Home Page" )
+
+
+
+
+Directives
+
+#set - Establishes the value of a reference
+
+Format:
+
+# [ { ] set [ } ] ( $ref = [ ", ' ]arg[ ", ' ] )
+
+Usage:
+
+$ref - The LHS of the assignment must be a variable reference or a property reference.
+arg - The RHS of the assignment, arg is parsed if enclosed in double quotes, and not parsed if enclosed in single quotes. If the RHS evaluates to null, it is not assigned to the LHS.
+Examples:
+
+Variable reference: #set( $monkey = $bill )
+String literal: #set( $monkey.Friend = 'monica' )
+Property reference: #set( $monkey.Blame = $whitehouse.Leak )
+Method reference: #set( $monkey.Plan = $spindoctor.weave($web) )
+Number literal: #set( $monkey.Number = 123 )
+Range operator: #set( $monkey.Numbers = [1..3] )
+Object list: #set( $monkey.Say = ["Not", $my, "fault"] )
+Object map: #set( $monkey.Map = {"banana" : "good", "roast beef" : "bad"})
+The RHS can also be a simple arithmetic expression, such as:
+
+Addition: #set( $value = $foo + 1 )
+Subtraction: #set( $value = $bar - 1 )
+Multiplication: #set( $value = $foo * $bar )
+Division: #set( $value = $foo / $bar )
+Remainder: #set( $value = $foo % $bar )
+
+
+
+#if/#elseif/#else - Output conditional on truth of statements
+
+Format:
+
+# [ { ] if [ } ] ( [condition] ) [output] [# [ { ] elseif [ } ] ( [condition] ) [output] ]* [# [ { ] else [ } ] [output] ] # [ { ] end [ } ]
+
+#if( $foo == 42 )
+
+
+
+
+#foreach - Loops through a list of objects
+
+Format:
+
+# [ { ] foreach [ } ] ($refinarg)statement# [ { ] end [ } ]
+
+Usage:
+
+$ref - The first variable reference is the item.
+arg - May be one of the following: a reference to a list (i.e. object array, collection, or map), an array list, or the range operator.
+statement - What is output each time Velocity finds a valid item in the list denoted above as arg. This output is any valid VTL and is rendered each iteration of the loop.
+Examples of the #foreach(), omitting the statement block :
+
+Reference: #foreach ( $item in $items )
+Array list: #foreach ( $item in ["Not", $my, "fault"] )
+Range operator: #foreach ( $item in [1..3] )
+
+
+
+#include - Renders local file(s) that are not parsed by Velocity
+
+
+#parse - Renders a local template that is parsed by Velocity
+
+
+
+Comments
+
+Comments are not rendered at runtime.
+
+Single Line Comments
+
+Example:
+
+## This is a comment.**
+Multi Line Comments?
+
+Example:
+
+#**
+  This is a multiline comment.
+  This is the second line.
+*#

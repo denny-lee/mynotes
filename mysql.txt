@@ -1,0 +1,24 @@
+2016-12-23
+Mysql
+
+安装，压缩包，解压
+在解压后的目录建一个my.ini文件：
+
+[mysqld]
+# set basedir to your installation path
+basedir=D:\\dbs\\mysql57
+# set datadir to the location of your data directory
+datadir=D:\\dbs\\mysql_data
+character-set-server=utf8
+collation-server=utf8_general_ci
+
+建好 data目录 
+初始化
+mysqld --initialize-insecure
+启动服务
+mysqld
+
+开启客户端
+mysql -u root
+
+关闭服务：mysqladmin -u root -p shutdown
