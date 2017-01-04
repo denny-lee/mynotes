@@ -12,7 +12,7 @@ git pull origin master 拉代码
 git diff HEAD
 git diff --staged
 git reset octofamily/octodog.txt
-git checkout -- octocat.txt
+git checkout -- octocat.txt		单个文件回退
 git branch clean_up  新建一分支
 git checkout clean_up	切换到这个分支
 git rm '*.txt' 删除
@@ -23,7 +23,7 @@ git branch -d clean_up	清掉分支
 git push
 
 
-
+git reset --hard HEAD 全部回退到上次提交的版本
 ---------------------------------------
 新建项目
 git init
@@ -31,6 +31,48 @@ git add README.md
 git commit -m "first commit"
 git remote add origin https://github.com/denny-lee/knowledge_front.git
 git push -u origin master
+--------------------------------------
+git tag 列出
+git tag -l "v1.8.5*" 列出匹配的
+创建tag
+Git uses two main types of tags: lightweight and annotated.
+A lightweight tag is very much like a branch that doesn’t change – it’s just a pointer to a specific commit.
+Annotated tags, however, are stored as full objects in the Git database. They’re checksummed; contain the tagger name, email, and date; have a tagging message; and can be signed and verified with GNU Privacy Guard (GPG). It’s generally recommended that you create annotated tags so you can have all this information; but if you want a temporary tag or for some reason don’t want to keep the other information, lightweight tags are available too.
+
+git tag v1.4-lw	简易版
+git tag -a v1.4 -m "my version 1.4" 推荐使用这种方式，加备注
+
+git show v1.4 显示信息
+
+Tagging Later
+You can also tag commits after you’ve moved past them. Suppose your commit history looks like this:
+git log --pretty=oneline	查一下提交过的版本
+如有一条9fceb02d0ae598e95dc970b74767f19372d61af8 updated rakefile
+git tag -a v1.2 9fceb02		tag那个版本To tag that commit, you specify the commit checksum (or part of it)
+git push origin v1.5	把tag，push到远程，默认只保存在本地
+git push origin --tags	把所有tag推到远程，远程没有的会新增，有的不变
+
+Checking out Tags
+git checkout -b version2 v2.0.0		得到一个version2的版本
+--------------------------------------
+
+如果你已经做了一个提交(commit),但是你马上后悔了, 这里有两种截然不同的方法去处理这个问题:
+
+1，创建一个新的提交(commit), 在新的提交里撤消老的提交所作的修改. 这种作法在你已经把代码发布的情况下十分正确.
+git revert HEAD
+git revert HEAD^上上次
+然后再git commit
+2，你也可以去修改你的老提交(old commit). 但是如果你已经把代码发布了,那么千万别这么做; git不会处理项目的历史会改变的情况,如果一个分支的历史被改变了那以后就不能正常的合并.
+git commit --amend 用于修改上一次的提交信息，或漏提交文件等情况。
+
+#取消已经暂存的文件。即，撤销先前"git add"的操作
+git reset HEAD <file>...
+#回退a.py这个文件的版本到上一个版本  
+git reset HEAD^ a.py  
+#向前回退到第3个版本  
+git reset –soft HEAD~3  
+#将本地的状态回退到和远程的一样  
+git reset –hard origin/master 
 --------------------------------------
 这句什么意思？
 git checkout -f step-1

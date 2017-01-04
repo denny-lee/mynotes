@@ -41,3 +41,13 @@ Object.assign();
 keys.filter(key => key !== k)
 
 
+2017-1-3
+React 只是一个UI
+虚拟DOM
+单向数据流
+
+react 中取dom元素，ref,
+<a ref="test" />
+this.refs.test.getDomNode();
+React.findDomNode(this.refs.test);
+
