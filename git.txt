@@ -12,7 +12,7 @@ git pull origin master 拉代码
 git diff HEAD
 git diff --staged
 git reset octofamily/octodog.txt
-git checkout -- octocat.txt		单个文件回退
+git checkout -- octocat.txt		单个文件回退   #若继续该命令，则会删除掉刚刚的修改内容
 git branch clean_up  新建一分支
 git checkout clean_up	切换到这个分支
 git rm '*.txt' 删除
@@ -59,20 +59,35 @@ git checkout -b version2 v2.0.0		得到一个version2的版本
 如果你已经做了一个提交(commit),但是你马上后悔了, 这里有两种截然不同的方法去处理这个问题:
 
 1，创建一个新的提交(commit), 在新的提交里撤消老的提交所作的修改. 这种作法在你已经把代码发布的情况下十分正确.
-git revert HEAD
+git revert HEAD 		#push后撤销该次commit
 git revert HEAD^上上次
 然后再git commit
 2，你也可以去修改你的老提交(old commit). 但是如果你已经把代码发布了,那么千万别这么做; git不会处理项目的历史会改变的情况,如果一个分支的历史被改变了那以后就不能正常的合并.
 git commit --amend 用于修改上一次的提交信息，或漏提交文件等情况。
 
 #取消已经暂存的文件。即，撤销先前"git add"的操作
-git reset HEAD <file>...
+git reset HEAD <file>... # 取消add操作并保留修改
 #回退a.py这个文件的版本到上一个版本  
 git reset HEAD^ a.py  
 #向前回退到第3个版本  
-git reset –soft HEAD~3  
+git reset –soft HEAD~3  #保留修改
 #将本地的状态回退到和远程的一样  
 git reset –hard origin/master 
+--------------------------------------
+修改之前提交过的user config信息，邮件，用户名等
+git commit --amend --author="Author Name <email@address.com>"
+For example, if your commit history is A-B-C-D-E-F with F as HEAD, and you want to change the author of C and D, then you would...
+
+Specify git rebase -i B
+change the lines for both C and D to edit
+Once the rebase started, it would first pause at C
+You would git commit --amend --author="Author Name <email@address.com>"
+Then git rebase --continue
+It would pause again at D
+Then you would git commit --amend --author="Author Name <email@address.com>" again
+git rebase --continue
+The rebase would complete.
+
 --------------------------------------
 这句什么意思？
 git checkout -f step-1

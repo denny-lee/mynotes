@@ -1,0 +1,36 @@
+2017-2-20
+定义变量
+target_base=~/target_project
+使用变量
+$target_base
+
+检查目录是否在在
+if [ -d $target_base ]
+if ! [ -d $target_base ] ; then
+
+删除某个目录下的文件
+cd $source_base
+rm -rf *
+
+创建多层目录
+mkdir -p $target_dir	
+
+字符串条件判断
+if [ "$op" == "M" ] || [ "$op" == "A" ] ; then
+
+读文件，
+echo结果赋值给变量用``或$()，
+取结果的某列awk
+cat ~/svndiff.log | \
+while read LINE; do
+	op=`echo $LINE | awk '{print $1}'`
+	if [ "$op" == "M" ] || [ "$op" == "A" ] ; then
+		rawstr=$(echo $LINE | awk '{print $2}')
+	fi
+done 
+
+字符串替换
+source_dir=${src_path//.java/.class}
+字符串截取，#号截取后面，%截取前面。正则匹配。##greedy，从左向右,%%greedy，从右向左。把匹配的删除。
+${rawstr#*/main/java}
+${desc_path%/*}

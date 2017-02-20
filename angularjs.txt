@@ -187,3 +187,77 @@ PhoneListController.$inject = ['$http'];
 function PhoneListController($http) {...}
 ...
 .component('phoneList', {..., controller: ['$http', PhoneListController]});
+
+
+2017-02-9
+controller定义中，$scope变量不能改名
+controller可以用module.controller（"PhoneListController"， function PhoneListController() {}）定义，ng-controller="PhoneListController"中引用
+也可以定义成component.用标签引用，如<phone-list>
+定义:phone-list.component.js
+angular
+	.module("myApp")
+	.component("phoneList", {
+		template: '<ul>' +
+          '<li ng-repeat="phone in $ctrl.phones">' +
+            '<span>{{phone.name}}</span>' +
+            '<p>{{phone.snippet}}</p>' +
+          '</li>' +
+        '</ul>',
+        controller: function () {
+			this.phones = [
+				{
+			      name: 'Nexus S',
+			      snippet: 'Fast just got faster with Nexus S.'
+			    }, {
+			      name: 'Motorola XOOM? with Wi-Fi',
+			      snippet: 'The Next, Next Generation tablet.'
+			    }, {
+			      name: 'MOTOROLA XOOM?',
+			      snippet: 'The Next, Next Generation tablet.'
+			    }
+		    ];
+		}
+	});
+文件组织：
+	一个特性一个文件夹
+	用module.
+
+双向绑定：
+	ng-model
+	<input ng-model="$ctrl.query">
+	<select ng-model="$ctrl.orderProp">
+          <option value="name">Alphabetical</option>
+          <option value="age">Newest</option>
+        </select>
+	<li ng-repeat="phone in $ctrl.phones | filter:$ctrl.query | orderBy:$ctrl.orderProp">
+	js:
+	self.orderProp = 'age';
+	
+简写
+controller: ['$http', function PhoneListController($http) {
+        	var self = this;
+        	self.orderProp = 'age';
+			
+			$http.get('phones/phones.json').then(function(response) {
+				self.phones = response.data;
+			});
+		}]
+controller: function PhoneListController($http) {
+        	var self = this;
+        	self.orderProp = 'age';
+			
+			$http.get('phones/phones.json').then(function(response) {
+				self.phones = response.data;
+			});
+		}
+controller: function ($http) {
+        	var self = this;
+        	self.orderProp = 'age';
+			
+			$http.get('phones/phones.json').then(function(response) {
+				self.phones = response.data;
+			});
+		}
+		
+		
+引入route如果中了prefix，在各template的url中要注意加上prefix

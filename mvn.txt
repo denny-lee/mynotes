@@ -1,0 +1,51 @@
+can do:
+Builds
+Documentation
+Reporting
+Dependencies
+SCMs
+Releases
+Distribution
+
+
+
+
+new project:
+
+mvn -B archetype:generate \
+  -DarchetypeGroupId=org.apache.maven.archetypes \
+  -DgroupId=com.mycompany.app \
+  -DartifactId=my-app
+  
+generate eclipse description:
+mvn eclipse:eclipse
+
+mvn complie
+mvn test
+mvn package
+mvn install
+
+
+SNAPSHOT version is 
+The SNAPSHOT value refers to the 'latest' code along a development branch, and provides no guarantee the code is stable or unchanging. Conversely, the code in a 'release' version (any version value without the suffix SNAPSHOT) is unchanging.
+
+where to place resources
+/src/main/resources
+or
+/src/test/resources
+get resources in java files :
+InputStream is = getClass().getResourceAsStream( "/test.properties" );
+
+mvn filter:
+可以把maven中的变量填到resources中的配置文件中
+变量可以是放在一个文件中
+也可以命令行指定
+mvn process-resources "-Dcommand.line.prop=hello again"
+
+
+create documentation
+mvn archetype:generate \
+  -DarchetypeGroupId=org.apache.maven.archetypes \
+  -DarchetypeArtifactId=maven-archetype-site \
+  -DgroupId=com.mycompany.app \
+  -DartifactId=my-app-site

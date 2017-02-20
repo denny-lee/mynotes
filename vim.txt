@@ -1,0 +1,15 @@
+2017-2-20
+
+vim
+多行插入
+ctrl+v
+出现virtual block
+按h,j,k,l选要编辑的行
+按shift+i插入，shift+a追加
+然后ESC
+
+多行删除
+ctrl+v
+出现virtual block
+按h,j,k,l选要编辑的行
+按d

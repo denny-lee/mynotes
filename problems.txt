@@ -67,4 +67,28 @@ sublime react插件，编辑js文件时，html代码可能<>不能正常匹配，导致高亮出错，jsx没
 线上调试工具
 http://demo.nwux.taobao.net/
 
+2017-1-4
+安装redis win版报错
+cc: 错误：../deps/hiredis/libhiredis.a：No such file or directory
+cc: 错误：../deps/lua/src/liblua.a：No such file or directory
+cc: 错误：../deps/geohash-int/geohash.o：No such file or directory
+cc: 错误：../deps/geohash-int/geohash_helper.o：No such file or directory
+
+解决：
+http://www.lai18.com/content/5859372.html
+vi /deps/hiredis/net.c
+/* Cygwin Fix */   
+#ifdef __CYGWIN__
+#define TCP_KEEPCNT 8
+#define TCP_KEEPINTVL 150
+#define TCP_KEEPIDLE 14400
+#endif
+
+$ cd deps
+$ make lua hiredis linenoise
+$ cd ..
+
+2017-1-13
+单元测试时，静态的资源没法读取
+
 

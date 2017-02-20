@@ -1,0 +1,7 @@
+2017-2-20
+
+svn检出到指定文件夹
+svn checkout -q url folder_name
+
+比较不同版本
+svn diff --summarize -r 232111:232112 > ~/svndiff.log
