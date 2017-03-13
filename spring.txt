@@ -1,0 +1,51 @@
+2017-2-21
+
+read source spring4.3.6RELEASE
+The Core Container consists of the spring-core, spring-beans, spring-context, spring-context-support, and spring-expression (Spring Expression Language) modules.
+
+spring-core
+	asm
+	cglib
+	core
+	lang
+	objenesis
+	util
+	
+org.springframework.beans and org.springframework.context packages are the basis for Spring Framework’s IoC container. 
+
+spring-context
+	context
+	
+	
+AbstractApplicationContext.getBean()
+AbstractRefreshableApplicationContext中
+AbstractXmlApplicationContext.loadBeanDefinitions()
+XmlBeanDefinitionReader.loadBeanDefinitions()
+XmlBeanDefinitionReader.doLoadBeanDefinitions()
+DefaultDocumentLoader.loadDocument()
+javax.xml.parsers.DocumentBuilder
+parse(InputSource),返回一个Document
+BeanDefinitionDocumentReader.registerBeanDefinitions()
+
+
+
+ConfigurableListableBeanFactory getBeanFactory()
+	同步方法，得到beanFactory
+AbstractBeanFactory.getBean()
+	泛行的doGetBean
+	getSingleton
+	log
+	getObjectForBeanInstance
+	if (BeanFactoryUtils.isFactoryDereference(name) && !(beanInstance instanceof FactoryBean)) {
+			throw new BeanIsNotAFactoryException(transformedBeanName(name), beanInstance.getClass());
+		}
+
+		// Now we have the bean instance, which may be a normal bean or a FactoryBean.
+		// If it's a FactoryBean, we use it to create a bean instance, unless the
+		// caller actually wants a reference to the factory.
+		if (!(beanInstance instanceof FactoryBean) || BeanFactoryUtils.isFactoryDereference(name)) {
+			return beanInstance;
+		}
+	DefaultSingletonBeanRegistry这里面已经有个ConcurrentHashMap，里面有bean
+	this.singletonObjects.get(beanName); 从一个 ConcurrentHashMap中get
+	(singletonObject != NULL_OBJECT ? singletonObject : null);

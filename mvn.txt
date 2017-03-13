@@ -17,6 +17,12 @@ mvn -B archetype:generate \
   -DgroupId=com.mycompany.app \
   -DartifactId=my-app
   
+web project:
+mvn archetype:generate 
+  -DgroupId=[your project's group id]
+  -DartifactId=[your project's artifact id]
+  -DarchetypeArtifactId=maven-archetype-webapp
+  
 generate eclipse description:
 mvn eclipse:eclipse
 
@@ -49,3 +55,625 @@ mvn archetype:generate \
   -DarchetypeArtifactId=maven-archetype-site \
   -DgroupId=com.mycompany.app \
   -DartifactId=my-app-site
+  
+  
+  
+2017-3-6
+pom.xml
+
+overview:
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+ 
+  <!-- The Basics -->
+  <groupId>...</groupId>
+  <artifactId>...</artifactId>
+  <version>...</version>
+  <packaging>...</packaging>
+  <dependencies>...</dependencies>
+  <parent>...</parent>
+  <dependencyManagement>...</dependencyManagement>
+  <modules>...</modules>
+  <properties>...</properties>
+ 
+  <!-- Build Settings -->
+  <build>...</build>
+  <reporting>...</reporting>
+ 
+  <!-- More Project Information -->
+  <name>...</name>
+  <description>...</description>
+  <url>...</url>
+  <inceptionYear>...</inceptionYear>
+  <licenses>...</licenses>
+  <organization>...</organization>
+  <developers>...</developers>
+  <contributors>...</contributors>
+ 
+  <!-- Environment Settings -->
+  <issueManagement>...</issueManagement>
+  <ciManagement>...</ciManagement>
+  <mailingLists>...</mailingLists>
+  <scm>...</scm>
+  <prerequisites>...</prerequisites>
+  <repositories>...</repositories>
+  <pluginRepositories>...</pluginRepositories>
+  <distributionManagement>...</distributionManagement>
+  <profiles>...</profiles>
+</project>
+
+
+------------------------------------------------------------------------
+groupId:artifactId:version必填，如果是使用了parent,groupId:version可不必填
+
+groupId: This is generally unique amongst an organization or a project.
+org.codehaus.mojo 存在$M2_REPO/org/codehaus/mojo.
+artifactId: The artifactId is generally the name that the project is known by.
+my-project 存在$M2_REPO/org/codehaus/mojo/my-project
+version:...
+$M2_REPO/org/codehaus/mojo/my-project/1.0.
+packaging: default is jar
+The current core packaging values are: pom, jar, maven-plugin, ejb, war, ear, rar, par.
+classifier:
+groupId:artifactId:packaging:classifier:version.
+
+当一个工程不能从中心库得到时：
+1,本地安装maven:
+mvn install:install-file -Dfile=non-maven-proj.jar -DgroupId=some.group -DartifactId=non-maven-proj -Dversion=1 -Dpackaging=jar
+2，Create your own repository and deploy it there.
+3,Set the dependency scope to system and define a systemPath.
+
+classifier:
+The classifier allows to distinguish artifacts that were built from the same POM but differ in their content.
+如同一个artifact支持jre5和jre4.
+type:
+针对不同的classifier设置不同的type. 如jar...
+scope:
+compile,默认值，依赖会加到所有的classpaths中。且会传播给引用它的其它项目
+provided ，只在编译和测试的运行时，且不传播
+runtime ，只在运行时，编译和测试时不包括
+test ，只在测试的编译和执行时，且不传播
+system ，和provided 类似，但是要明确指定要哪些jar
+systemPath:
+只有在scope是system时使用
+optional
+	In the shortest terms, optional lets other projects know that, when you use this project, you do not require this dependency in order to work correctly.
+	
+Dependency Version接受的语法：
+1.0: "Soft" requirement on 1.0 (just a recommendation, if it matches all other ranges for the dependency)
+[1.0]: "Hard" requirement on 1.0
+(,1.0]: x <= 1.0
+[1.2,1.3]: 1.2 <= x <= 1.3
+[1.0,2.0): 1.0 <= x < 2.0
+[1.5,): x >= 1.5
+(,1.0],[1.2,): x <= 1.0 or x >= 1.2; multiple sets are comma-separated
+(,1.1),(1.1,): this excludes 1.1 (for example if it is known not to work in combination with this library)
+
+exclusions
+
+多模块的Inheritance：
+不会继承父pom的：
+artifactId
+name
+prerequisites
+
+dependencyManagement：
+	is used by POMs to help manage dependency information across all of its children.
+
+------------------------------------------------------------------------
+Properties
+五种风格：
+1，env.X: Prefixing a variable with "env." will return the shell's environment variable. For example, ${env.PATH} contains the PATH environment variable.
+2，project.x: A dot (.) notated path in the POM will contain the corresponding element's value. For example: <project><version>1.0</version></project> is accessible via ${project.version}.
+3，settings.x: A dot (.) notated path in the settings.xml will contain the corresponding element's value. For example: <settings><offline>false</offline></settings> is accessible via ${settings.offline}.
+4，Java System Properties: All properties accessible via java.lang.System.getProperties() are available as POM properties, such as ${java.home}.
+5，x: Set within a <properties /> element in the POM. The value of <properties><someVar>value</someVar></properties> may be used as ${someVar}
+
+
+Build:
+两种
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <!-- "Project Build" contains more elements than just the BaseBuild set -->
+  <build>...</build>
+ 
+  <profiles>
+    <profile>
+      <!-- "Profile Build" contains a subset of "Project Build"s elements -->
+      <build>...</build>
+    </profile>
+  </profiles>
+</project>
+
+The BaseBuild Element Set:
+<build>
+  <defaultGoal>install</defaultGoal>
+  <directory>${basedir}/target</directory>
+  <finalName>${artifactId}-${version}</finalName>
+  <filters>
+    <filter>filters/filter1.properties</filter>
+  </filters>
+  ...
+</build>
+
+
+defaultGoal:
+directory,  defaults to ${basedir}/target.
+finalName,	
+	his is the name of the bundled project when it is finally built (sans the file extension, for example: my-project-1.0.jar). It defaults to ${artifactId}-${version}.
+filter
+	what filter can do??
+	
+Resources		is a list of resource elements that each describe what and where to include files associated with this project.
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <build>
+    ...
+    <resources>
+      <resource>
+        <targetPath>META-INF/plexus</targetPath>
+        <filtering>false</filtering>
+        <directory>${basedir}/src/main/plexus</directory>
+        <includes>
+          <include>configuration.xml</include>
+        </includes>
+        <excludes>
+          <exclude>**/*.properties</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <testResources>
+      ...
+    </testResources>
+    ...
+  </build>
+</project>
+
+targetPath:
+	Specifies the directory structure to place the set of resources from a build. Target path defaults to the base directory. A commonly specified target path for resources that will be packaged in a JAR is META-INF.
+filtering: 
+	is true or false, denoting if filtering is to be enabled for this resource. Note, that filter *.properties files do not have to be defined for filtering to occur - resources can also use properties that are by default defined in the POM (such as ${project.version}), passed into the command line using the "-D" flag (for example, "-Dname=value") or are explicitly defined by the properties element. Filter files were covered above.
+directory: 
+	This element's value defines where the resources are to be found. The default directory for a build is ${basedir}/src/main/resources.
+includes: 
+	A set of files patterns which specify the files to include as resources under that specified directory, using * as a wildcard.
+excludes: 
+	The same structure as includes, but specifies which files to ignore. In conflicts between include and exclude, exclude wins.
+testResources: 
+	The testResources element block contains testResource elements. Their definitions are similar to resource elements, but are naturally used during test phases. The one difference is that the default (Super POM defined) test resource directory for a project is ${basedir}/src/test/resources. Test resources are not deployed.
+
+Plugins
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <build>
+    ...
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.6</version>
+        <extensions>false</extensions>
+        <inherited>true</inherited>
+        <configuration>
+          <classifier>test</classifier>
+        </configuration>
+        <dependencies>...</dependencies>
+        <executions>...</executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+
+extensions: 后面解释
+inherited:是否向继承这个pom的文件应用这个插件
+configuration：If your POM declares a parent, it will inherit plugin configuration from either the build/plugins or pluginManagement sections of the parent.
+dependencies：与通常的dependencies一样结构，但只针对plugin
+executions：一个插件可能多个goals，
+
+pluginManagement：定义好插件，子pom直接引用
+父：
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <build>
+    ...
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.6</version>
+          <executions>
+            <execution>
+              <id>pre-process-classes</id>
+              <phase>compile</phase>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+              <configuration>
+                <classifier>pre-process</classifier>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    ...
+  </build>
+</project>
+子：
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <build>
+    ...
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+      </plugin>
+    </plugins>
+    ...
+  </build>
+</project>
+
+
+project build有，而profile build没有的：
+directories and extensions.
+Directories
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <build>
+    <sourceDirectory>${basedir}/src/main/java</sourceDirectory>
+    <scriptSourceDirectory>${basedir}/src/main/scripts</scriptSourceDirectory>
+    <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
+    <outputDirectory>${basedir}/target/classes</outputDirectory>
+    <testOutputDirectory>${basedir}/target/test-classes</testOutputDirectory>
+    ...
+  </build>
+</project>
+
+Extensions
+	Extensions are a list of artifacts that are to be used in this build. They will be included in the running build's classpath.
+
+Reporting	和site阶段有关
+下面可以配置plugins，和build下配置plugins一样。但反过来，build下的plugins不会影响reporting下面的
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <reporting>
+    <outputDirectory>${basedir}/target/site</outputDirectory>
+    <plugins>
+      <plugin>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.0.1</version>
+        <reportSets>
+          <reportSet></reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
+  ...
+</project>
+
+------------------------------------------------------------------------
+
+其它节点元素：
+name: Projects tend to have conversational names, beyond the artifactId. The Sun engineers did not refer to their project as "java-1.5", but rather just called it "Tiger". Here is where to set that value.
+description: Description of a project is always good. Although this should not replace formal documentation, a quick comment to any readers of the POM is always helpful.
+url: The URL, like the name, is not required. This is a nice gesture for projects users, however, so that they know where the project lives.
+inceptionYear: This is another good documentation point. It will at least help you remember where you have spent the last few years of your life.
+
+Licenses
+<licenses>
+  <license>
+    <name>Apache License, Version 2.0</name>
+    <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    <distribution>repo</distribution>
+    <comments>A business-friendly OSS license</comments>
+  </license>
+</licenses>
+
+Organization
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <organization>
+    <name>Codehaus Mojo</name>
+    <url>http://mojo.codehaus.org</url>
+  </organization>
+</project>
+
+Developers
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <developers>
+    <developer>
+      <id>jdoe</id>
+      <name>John Doe</name>
+      <email>jdoe@example.com<email>
+      <url>http://www.example.com/jdoe</url>
+      <organization>ACME</organization>
+      <organizationUrl>http://www.example.com</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>America/New_York</timezone>
+      <properties>
+        <picUrl>http://www.example.com/jdoe/pic</picUrl>
+      </properties>
+    </developer>
+  </developers>
+  ...
+</project>
+
+Contributors
+。。。
+------------------------------------------------------------------------
+Environment Settings
+Issue Management
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <issueManagement>
+    <system>Bugzilla</system>
+    <url>http://127.0.0.1/bugzilla/</url>
+  </issueManagement>
+  ...
+</project>
+
+Continuous Integration Management
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <ciManagement>
+    <system>continuum</system>
+    <url>http://127.0.0.1:8080/continuum</url>
+    <notifiers>
+      <notifier>
+        <type>mail</type>
+        <sendOnError>true</sendOnError>
+        <sendOnFailure>true</sendOnFailure>
+        <sendOnSuccess>false</sendOnSuccess>
+        <sendOnWarning>false</sendOnWarning>
+        <configuration><address>continuum@127.0.0.1</address></configuration>
+      </notifier>
+    </notifiers>
+  </ciManagement>
+  ...
+</project>
+
+Mailing Lists
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <mailingLists>
+    <mailingList>
+      <name>User List</name>
+      <subscribe>user-subscribe@127.0.0.1</subscribe>
+      <unsubscribe>user-unsubscribe@127.0.0.1</unsubscribe>
+      <post>user@127.0.0.1</post>
+      <archive>http://127.0.0.1/user/</archive>
+      <otherArchives>
+        <otherArchive>http://base.google.com/base/1/127.0.0.1</otherArchive>
+      </otherArchives>
+    </mailingList>
+  </mailingLists>
+  ...
+</project>
+
+SCM 	版本控制 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <scm>
+    <connection>scm:svn:http://127.0.0.1/svn/my-project</connection>
+    <developerConnection>scm:svn:https://127.0.0.1/svn/my-project</developerConnection>
+    <tag>HEAD</tag>
+    <url>http://127.0.0.1/websvn/my-project</url>
+  </scm>
+  ...
+</project>
+
+Prerequisites 先决条件
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <prerequisites>
+    <maven>2.0.6</maven>
+  </prerequisites>
+  ...
+</project>
+
+
+Repositories
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>warn</checksumPolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+      </snapshots>
+      <id>codehausSnapshots</id>
+      <name>Codehaus Snapshots</name>
+      <url>http://snapshots.maven.codehaus.org/maven2</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    ...
+  </pluginRepositories>
+  ...
+</project>
+
+Distribution Management
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <distributionManagement>
+    ...
+    <downloadUrl>http://mojo.codehaus.org/my-project</downloadUrl>
+    <status>deployed</status>
+  </distributionManagement>
+  ...
+</project>
+
+status: Warning! Like a baby bird in a nest, the status should never be touched by human hands! The reason for this is that Maven will set the status of the project when it is transported out to the repository. Its valid types are as follows.
+none: No special status. This is the default for a POM.
+converted: The manager of the repository converted this POM from an earlier version to Maven 2.
+partner: This could just as easily have been called synched. This means that this artifact has been synched with a partner repository.
+deployed: By far the most common status, meaning that this artifact was deployed from a Maven 2 or 3 instance. This is what you get when you manually deploy using the command-line deploy phase.
+verified: This project has been verified, and should be considered finalized.
+
+
+Repository
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <distributionManagement>
+    <repository>
+      <uniqueVersion>false</uniqueVersion>
+      <id>corp1</id>
+      <name>Corporate Repository</name>
+      <url>scp://repo/maven2</url>
+      <layout>default</layout>
+    </repository>
+    <snapshotRepository>
+      <uniqueVersion>true</uniqueVersion>
+      <id>propSnap</id>
+      <name>Propellors Snapshots</name>
+      <url>sftp://propellers.net/maven</url>
+      <layout>legacy</layout>
+    </snapshotRepository>
+    ...
+  </distributionManagement>
+  ...
+</project>
+
+Site Distribution
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <distributionManagement>
+    ...
+    <site>
+      <id>mojo.website</id>
+      <name>Mojo Website</name>
+      <url>scp://beaver.codehaus.org/home/projects/mojo/public_html/</url>
+    </site>
+    ...
+  </distributionManagement>
+  ...
+</project>
+
+Relocation 改名了，或者换位置了，告诉使用者
+
+------------------------------------------------------------------------
+Profiles	环境变量（在特定的情况下使用的）
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <profiles>
+    <profile>
+      <id>test</id>
+      <activation>...</activation>
+      <build>...</build>
+      <modules>...</modules>
+      <repositories>...</repositories>
+      <pluginRepositories>...</pluginRepositories>
+      <dependencies>...</dependencies>
+      <reporting>...</reporting>
+      <dependencyManagement>...</dependencyManagement>
+      <distributionManagement>...</distributionManagement>
+    </profile>
+  </profiles>
+</project>
+
+Activation：在哪种情况下使用
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  ...
+  <profiles>
+    <profile>
+      <id>test</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+        <jdk>1.5</jdk>
+        <os>
+          <name>Windows XP</name>
+          <family>Windows</family>
+          <arch>x86</arch>
+          <version>5.1.2600</version>
+        </os>
+        <property>
+          <name>sparrow-type</name>
+          <value>African</value>
+        </property>
+        <file>
+          <exists>${basedir}/file2.properties</exists>
+          <missing>${basedir}/file1.properties</missing>
+        </file>
+      </activation>
+      ...
+    </profile>
+  </profiles>
+</project>
+------------------------------------------------------------------------
+------------------------------------------------------------------------
+------------------------------------------------------------------------

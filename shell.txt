@@ -34,3 +34,18 @@ source_dir=${src_path//.java/.class}
 字符串截取，#号截取后面，%截取前面。正则匹配。##greedy，从左向右,%%greedy，从右向左。把匹配的删除。
 ${rawstr#*/main/java}
 ${desc_path%/*}
+
+
+数字求值赋值
+a=`expr $a + 1`
+
+黑洞：
+/dev/null
+用法：
+ping -q -c4 xxx.xx.xx.xxx > /dev/null
+if [ $? -eq 0 ]
+then
+	echo "ok"
+fi
+命令成功，返回ok
+
