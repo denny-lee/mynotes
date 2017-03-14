@@ -1,0 +1,62 @@
+2017/3/14 16:58:15
+NFC
+
+
+There are two major uses cases when working with NDEF data and Android:
+
+Reading NDEF data from an NFC tag
+Beaming NDEF messages from one device to another with Android Beam™
+
+Android-powered devices are usually looking for NFC tags when the screen is unlocked, unless NFC is disabled in the device's Settings menu. When an Android-powered device discovers an NFC tag, the desired behavior is to have the most appropriate activity handle the intent without asking the user what application to use. Because devices scan NFC tags at a very short range, it is likely that making users manually select an activity would force them to move the device away from the tag and break the connection. You should develop your activity to only handle the NFC tags that your activity cares about to prevent the Activity Chooser from appearing.
+
+To help you with this goal, Android provides a special tag dispatch system that analyzes scanned NFC tags, parses them, and tries to locate applications that are interested in the scanned data. It does this by:
+
+1,Parsing the NFC tag and figuring out the MIME type or a URI that identifies the data payload in the tag.
+2,Encapsulating the MIME type or URI and the payload into an intent. These first two steps are described in How NFC tags are mapped to MIME types and URIs.
+3,Starts an activity based on the intent. This is described in How NFC Tags are Dispatched to Applications.
+
+2002年此技术被重视，加入国标标准
+
+2010年，三星生产了世界第一部NFC功能的手机
+
+
+The tag dispatch system defines three intents, which are listed in order of highest to lowest priority:
+
+1，ACTION_NDEF_DISCOVERED: This intent is used to start an Activity when a tag that contains an NDEF payload is scanned and is of a recognized type. This is the highest priority intent, and the tag dispatch system tries to start an Activity with this intent before any other intent, whenever possible.
+2，ACTION_TECH_DISCOVERED: If no activities register to handle the ACTION_NDEF_DISCOVERED intent, the tag dispatch system tries to start an application with this intent. This intent is also directly started (without starting ACTION_NDEF_DISCOVERED first) if the tag that is scanned contains NDEF data that cannot be mapped to a MIME type or URI, or if the tag does not contain NDEF data but is of a known tag technology.
+3，ACTION_TAG_DISCOVERED: This intent is started if no activities handle the ACTION_NDEF_DISCOVERED or ACTION_TECH_DISCOVERED intents.
+
+The basic way the tag dispatch system works is as follows:
+
+Try to start an Activity with the intent that was created by the tag dispatch system when parsing the NFC tag (either ACTION_NDEF_DISCOVERED or ACTION_TECH_DISCOVERED).
+If no activities filter for that intent, try to start an Activity with the next lowest priority intent (either ACTION_TECH_DISCOVERED or ACTION_TAG_DISCOVERED) until an application filters for the intent or until the tag dispatch system tries all possible intents.
+If no applications filter for any of the intents, do nothing.
+
+
+
+<uses-permission android:name="android.permission.NFC" />
+
+<uses-sdk android:minSdkVersion="10"/>
+
+不带NFC功能的设备，在google play上看不到:
+<uses-feature android:name="android.hardware.nfc" android:required="true" />
+
+
+<intent-filter>
+    <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+    <category android:name="android.intent.category.DEFAULT"/>
+    <data android:mimeType="text/plain" />
+</intent-filter>
+
+
+The following example filters for a URI in the form of http://developer.android.com/index.html.
+
+<intent-filter>
+    <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+    <category android:name="android.intent.category.DEFAULT"/>
+   <data android:scheme="http"
+              android:host="developer.android.com"
+              android:pathPrefix="/index.html" />
+</intent-filter>
+
+
