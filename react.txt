@@ -51,3 +51,47 @@ react 中取dom元素，ref,
 this.refs.test.getDomNode();
 React.findDomNode(this.refs.test);
 
+
+2017/3/20 13:34:39
+Redux 基础
+Actions are payloads of information that send data from your application to your store. They are the only source of information for the store. You send them to the store using store.dispatch().
+import { ADD_TODO, REMOVE_TODO } from '../actionTypes'
+const ADD_TODO = 'ADD_TODO'
+{
+  type: ADD_TODO,
+  text: 'Build my first Redux app'
+}
+小应用可直接用string.
+一般action中的Type定义成变量是比较好的做法
+
+Reducers
+
+Actions describe the fact that something happened, but don't specify how the application's state changes in response. This is the job of reducers.
+
+做了什么：(previousState, action) => newState
+Things you should never do inside a reducer:
+
+Mutate its arguments;
+Perform side effects like API calls and routing transitions;
+Call non-pure functions, e.g. Date.now() or Math.random().
+
+
+Store
+The Store is the object that brings them together. The store has the following responsibilities:
+
+import { createStore } from 'redux'
+import todoApp from './reducers'
+let store = createStore(todoApp)
+
+store.dispatch(addTodo('Learn about actions'))
+
+
+Data Flow
+Redux architecture revolves around a strict unidirectional data flow.
+The data lifecycle in any Redux app follows these 4 steps:
+You call store.dispatch(action).
+		You can call store.dispatch(action) from anywhere in your app, including components and XHR callbacks, or even at scheduled intervals.
+The Redux store calls the reducer function you gave it.
+The root reducer may combine the output of multiple reducers into a single state tree.
+The Redux store saves the complete state tree returned by the root reducer.
+

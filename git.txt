@@ -128,3 +128,12 @@ git pull
 其中git reset是针对版本,如果想针对文件回退本地修改,使用
 git checkout HEAD file/to/restore 
 
+------------------------------------
+配置ssh:
+配置好username和email，全局
+切到 ~/.ssh/目录，如果有，备份然后删除
+ssh-keygen -t rsa -C "wb-lw252418@alibaba-inc.com"
+“”里是email
+如果不设置密码直接enter 3次
+去.ssh/id_rsa.pub，把key配置到git上。
+ok

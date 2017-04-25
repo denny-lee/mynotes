@@ -92,3 +92,9 @@ $ cd ..
 单元测试时，静态的资源没法读取
 
 
+2017/3/16 15:11:21
+linux服务器上的spring-boot应用上传文件报500，本地正常。查后台：
+error throws by aui: Request processing failed; nested exception is org.springframework.web.multipart.MultipartException: Could not parse multipart servlet request; nested exception is java.io.IOException: The temporary upload location [/tmp/tomcat.3311038716777652430.8080/work/Tomcat/localhost/ROOT] is not valid
+
+解决方法：
+加启动参数：-Djava.io.tmpdir=/var/tmp
