@@ -1,0 +1,36 @@
+Html5
+
+new Features:
+1, new elements: canvas video section footer header ...
+2, new input: date, email, url
+3, delete elements: frame noframe frameset font applet...
+4, SVG uses MathML online.
+5, web storage
+6, web sql database
+7, websocket
+8, drag-drop
+
+
+
+SVG 基于xml的矢量图形语言，或者说是一种图像格式。
+
+SVG vs. Canvas
+矢量 vs. 位图
+
+
+webSocket protrol
+Based on HTTP protrol
+So, port is 80, secure connect port 443
+ws://
+wss://
+
+Proccess:
+1, use GET method to get connection. -- shake hands.
+2, 握手成功后， 进入数据交换状态，通信以“帧”为单位，由帧间隔符（字节）间隔
+3, 可以发字符串，也可以发二进
+4, 可以设计子协议
+
+var ws = new WebSocket("ws://...");
+ws.onopen = function() {}
+ws.onmessage = function(event) { alert(event.data); }
+ws.send()
