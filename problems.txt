@@ -98,3 +98,21 @@ error throws by aui: Request processing failed; nested exception is org.springfr
 
 解决方法：
 加启动参数：-Djava.io.tmpdir=/var/tmp
+
+
+2017/4/27 15:25:06
+处理docker,空间满了
+df -h
+停docker服务  
+rm -rf docker
+rm -rf rancher
+systemctl stop firewalld
+systemctl start docker
+docker ps
+从rancher上复制了一段：
+sudo docker run -d --privileged -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/rancher:/var/lib/rancher aegis-paas.aliyun.com:5000/rancher/agent:1.0 http://11.239.175.80:11111/v1/scripts/0CFBE613D4C5EA94F72E:1493276400000:lU1tHzw0AKFSmReO4yzZZpo4
+docker logs -f 21
+
+---------------------
+存储空间满了
+docker images --no-trunc| grep none | awk '{print $3}' | xargs -r docker rmi

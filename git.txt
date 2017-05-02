@@ -137,3 +137,11 @@ ssh-keygen -t rsa -C "wb-lw252418@alibaba-inc.com"
 如果不设置密码直接enter 3次
 去.ssh/id_rsa.pub，把key配置到git上。
 ok
+
+---------------------------
+git pull 时提示冲突 ，取远程对方的
+git checkout a1f36d -- filename
+
+-----------------------------
+关联远程分支
+git branch --set-upstream-to=origin/<branch>  <branch> 关联远程分支

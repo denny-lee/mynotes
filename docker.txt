@@ -1,0 +1,8 @@
+2017/4/28 14:05:15
+从主机进某个docker容器：
+
+docker ps
+
+a4f是container Id ports
+
+docker exec -it a4f bash
