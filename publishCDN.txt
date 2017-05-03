@@ -1,0 +1,8 @@
+
+
+发布到cdn流程：
+1. master上grunt build，然后提交build目录
+2. 从master新建daily/0.1.0分支，git checkout -b daily/0.1.0, git push origin daily/0.1.0
+3. 建立publish tag，git tag -a publish/0.1.0 -m”add tag”
+4. git push origin --tag publish/0.1.0
+5. 发布完成
