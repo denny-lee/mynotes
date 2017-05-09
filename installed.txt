@@ -1,0 +1,26 @@
+Git
+Svn
+---------
+Mysql
+Mongodb
+---------
+Nodejs & npm & tnpm
+Jdk8
+Maven3.3.9
+Cygwin
+StrawBerryPerl
+-------
+webstrom
+eclipse
+sublime3
+MobaXterm
+navicat/sqlyog
+VNC viewer
+
+------------
+7-zip
+chrome
+ihost
+jd-gui
+
+
