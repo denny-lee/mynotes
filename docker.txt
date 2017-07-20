@@ -6,3 +6,40 @@ docker ps
 a4f «container Id ports
 
 docker exec -it a4f bash
+
+
+jekins config:
+
+echo "start to build image:"$version" type:"$type
+find . -name ".svn" | xargs rm -rf
+if [ $type = "paas-license" ]; then
+    domain="aegis-paas.aliyun.com:5000"
+elif [ $type = "saas-group" ]; then
+    domain="aegis-saas.aliyun.com:5000"
+elif [ $type = "saas" ]; then
+    domain="aegis-paas.aliyun.com:5000"
+else
+    domain="aegis-$type.aliyun.com:5000"
+fi
+
+source /root/.profile
+echo "[INFO] start compile"
+TARGET_WAR="aegis.hera.deploy.tar.gz"
+if mvn clean install -Dmaven.test.skip -Denv=release -U
+then
+   echo "[INFO] compile success"
+   mkdir web-deploy
+   cp target/$TARGET_WAR web-deploy/
+   cp antx.properties.* web-deploy/
+   cd web-deploy
+   tar -zxf ${TARGET_WAR}
+   echo "[INFO] start autoconf"
+   mvn autoconf:autoconf -Dpath=. -Dpackages=web.war -Dproperties=antx.properties.$type
+   echo "[INFO] autoconf success"
+   cd ..
+else
+   echo "[ERROR] compile failed"
+   exit 1
+fi
+docker build -t $domain/aui-hera:$version .
+docker push $domain/aui-hera:$version
