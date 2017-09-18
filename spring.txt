@@ -49,3 +49,18 @@ AbstractBeanFactory.getBean()
 	DefaultSingletonBeanRegistry这里面已经有个ConcurrentHashMap，里面有bean
 	this.singletonObjects.get(beanName); 从一个 ConcurrentHashMap中get
 	(singletonObject != NULL_OBJECT ? singletonObject : null);
+
+	
+	
+2017-8-21
+spring-aop
+
+Choosing which AOP declaration style to use
+Spring AOP or full AspectJ?
+
+Use the simplest thing that can work. Spring AOP is simpler than using full AspectJ as there is no requirement to introduce the AspectJ compiler / weaver into your development and build processes.
+You will also need to use AspectJ if you wish to advise join points other than simple method executions (for example, field get or set join points, and so on).
+
+
+@AspectJ or XML for Spring AOP?
+

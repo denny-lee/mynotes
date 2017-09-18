@@ -1,0 +1,135 @@
+2017-09-13
+netty中的概念
+
+Netty
+
+背景：
+我们经常会用到应用和库之间的通信。例如HttpClient库，通过调用web服务来获取信息。然而，常见的协议及其实现的可伸缩性通常不是很好。就像我们不会使用基本的HTTP服务器去交换大文件、email信息以及像财务信息和多玩家的游戏数据这样的实时消息。像这种情形下，我们需要的是针对特定目的高度优化的协议实现。例如，你想要为基于Ajax的聊天应用、媒体流或大文件传输实现一个优化过的HTTP服务。你可能想设计和实现一个为你的需求量身定制的全新的协议。另一个必然的情况，是你想要处理传统的专有协议保证它与旧系统的互操作性。问题是在这种情况下，在不牺牲应用的稳定性和性能的前提下，我们能多快实现这个协议。
+
+解决：
+	Netty致力于为快速开发可维护、高性能、高伸缩协议服务端或客户端，提供一个异步的事件驱动的网络应用框架和工具。
+
+依赖：
+	Jdk1.6 +
+
+NioEventLoopGroup
+	处理IO的多线程事件循环
+	服务端2个，boss用于进来的连接，worker处理被boss接受，并注册到worker的通信
+	使用多少个线程以及如何与创建的通道映射，是取决于EventLoopGroup的具体实现，且可以通过构造方法来设置。
+
+tcpChannelOptions
+ChannelOption.SO_KEEPALIVE
+ChannelOption.SO_BACKLOG
+
+channel,NioServerSocketChannel.class（客户端NioSocketChannel）
+
+
+ChannelInitializer
+	
+initChannel方法装配ChannelPipeline。add 多个ChannelInboundHandler
+
+ServerBootstrap（客户端对应的Bootstrap）
+是帮助类，用于创建Server，也可以通过Channel来创建，但很繁琐，因为很多默认设置可能没有必要写。
+	需要设置group, channel, channelHandler(initializer), options, 
+	启动时bind一个InetSocketAddress，再sync()，返回ChannelFuture
+	handler处理接收连接的
+	childHandler设置的handler，处理父channel接受的连接的。每个新的channel都会处理。
+	ChannelInitializer是一个特殊的handler用于配置一个新的channel，通常用于配置ChannelPipeLine.
+
+option和childOption的区别：
+	option是用于设置接收连接的的channel的。
+	childOption是用于设置父channel接受的channel的。
+
+bind方法可以调用多次，绑定多个端口
+
+关于ChannelInboundHandlerAdapter：
+public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    try {
+        // Do something with msg
+    } finally {
+        ReferenceCountUtil.release(msg);
+    }
+}
+在channelRead中，必须在处理完release掉msg。writeAndFlush方法会自带release.
+public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) { // (4)
+        // Close the connection when an exception is raised.
+        cause.printStackTrace();
+        ctx.close();
+    }
+is called with a Throwable when an exception was raised by Netty due to an I/O error or by a handler implementation due to the exception thrown while processing events. 
+在这个方法中可以记录日志，并关闭channel.
+可以通过实现这个方法来完成不同的处理，比如发送错误码
+
+注意，与nio不同，这里final ChannelFuture f = ctx.writeAndFlush(time);发消息不需要flip。因为netty使用自己的指针操作方式。
+返回ChannelFuture，代表IO操作还没发生。在netty里所有操作都是异步的。
+Channel ch = ...;
+ch.writeAndFlush(message);
+ch.close();
+可能在没有写消息时就关闭了channel.应该在ChannelFuture执行完后再关。通过listeners。
+Close()方法依然是异常的，返回是ChannelFuture.
+final ChannelFuture f = ctx.writeAndFlush(time); // (3)
+        f.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) {
+                assert f == future;
+                ctx.close();
+            }
+        });
+也可以用预定义的f.addListener(ChannelFutureListener.CLOSE);
+
+
+客户端：
+Bootstrap
+Group只需要worker
+NioSocketChannel
+不用childOption，因为客户端SocketChannel没有parant
+不用bind，用connect
+
+注意IndexOutOfBoundsException异常
+
+
+
+小警告：
+像TCP/IP这种以流传输的方式中，接收的数据可能存在buffer中。但buffer不是包的队列而是字节队列。所以需要一个或多个有意义的Frame来接收，方便理解程序的逻辑。
+
+解决办法：
+可以定义一个Handler专门处理这个问题。
+可以继承
+public class TimeDecoder extends ByteToMessageDecoder { // (1)
+    @Override
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) { // (2)
+        if (in.readableBytes() < 4) {
+            return; // (3)
+        }
+        
+        out.add(in.readBytes(4)); // (4)
+    }
+}
+使用POJO而非ByteBuf
+需要Encoder
+继承ChannelOutboundHandlerAdapter
+或MessageToByteEncoder<UnixTime>
+
+
+关闭：
+shutdownGracefully
+会把所有的创建的组及组中的Channel都关闭
+
+	
+PropertySourcesPlaceholderConfigurer 是spring disconf的？
+
+
+常见ChannelInboundHandler
+ReadTimeoutHandler
+HttpServerCodec
+HttpObjectAggregator
+WebSocketServerCompressionHandler
+BinaryWebSocketFrameEncoder
+---
+WebSocketServerProtocolHandler
+WebSocketIndexPageHandler这个很神奇
+WebSocketFrameHandler
+
+google.protobuf??
+
+@ChannelHandler.Sharable？？

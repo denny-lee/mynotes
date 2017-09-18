@@ -1,0 +1,33 @@
+2017/9/8
+@SendToUser
+	当没有用spring-security时，user为空，所以订阅方是收不到消息的
+	
+配置websocket-security时，使用配置
+public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBrokerConfigurer {
+
+    protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
+        messages.simpDestMatchers("/user/*").authenticated();
+    }
+}
+依赖
+	<dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-messaging</artifactId>
+        <version>4.2.3.RELEASE</version>
+      </dependency>
+	  
+	  
+	  
+使用security后，Websocket连接时若没有用户登陆认证，提示，连接失败
+<<< ERROR
+message:Failed to send message to ExecutorSubscribableChannel[clientInboundChannel]; nested exception is org.springframework.security.web.csrf.MissingCsrfTokenException\c Could not verify the provided CSRF token because your session was not found.
+content-length:0
+
+
+
+
+2017/9/11
+Login后，配置了认证的ws，方能连接成功。消息能正常接收。
+当Logout后，ws连接自动断开，服务端发的消息客户端不再能接收到。
+例：
+	STOMP客户端当logout后，监听到消息时提示：Whoops! Lost connection to http://localhost:8081/war/dak/msgcenter。并且收不消息内容。
