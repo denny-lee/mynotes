@@ -115,6 +115,100 @@ public class TimeDecoder extends ByteToMessageDecoder { // (1)
 shutdownGracefully
 会把所有的创建的组及组中的Channel都关闭
 
+
+ChannelPipeline, Handler顺序
+---------------------
+                                                 I/O Request
+                                            via Channel or
+                                        ChannelHandlerContext
+                                                      |
+  +---------------------------------------------------+---------------+
+  |                           ChannelPipeline         |               |
+  |                                                  \|/              |
+  |    +---------------------+            +-----------+----------+    |
+  |    | Inbound Handler  N  |            | Outbound Handler  1  |    |
+  |    +----------+----------+            +-----------+----------+    |
+  |              /|\                                  |               |
+  |               |                                  \|/              |
+  |    +----------+----------+            +-----------+----------+    |
+  |    | Inbound Handler N-1 |            | Outbound Handler  2  |    |
+  |    +----------+----------+            +-----------+----------+    |
+  |              /|\                                  .               |
+  |               .                                   .               |
+  | ChannelHandlerContext.fireIN_EVT() ChannelHandlerContext.OUT_EVT()|
+  |        [ method call]                       [method call]         |
+  |               .                                   .               |
+  |               .                                  \|/              |
+  |    +----------+----------+            +-----------+----------+    |
+  |    | Inbound Handler  2  |            | Outbound Handler M-1 |    |
+  |    +----------+----------+            +-----------+----------+    |
+  |              /|\                                  |               |
+  |               |                                  \|/              |
+  |    +----------+----------+            +-----------+----------+    |
+  |    | Inbound Handler  1  |            | Outbound Handler  M  |    |
+  |    +----------+----------+            +-----------+----------+    |
+  |              /|\                                  |               |
+  +---------------+-----------------------------------+---------------+
+                  |                                  \|/
+  +---------------+-----------------------------------+---------------+
+  |               |                                   |               |
+  |       [ Socket.read() ]                    [ Socket.write() ]     |
+  |                                                                   |
+  |  Netty Internal I/O Threads (Transport Implementation)            |
+  +-------------------------------------------------------------------+
+ 
+For example, let us assume that we created the following pipeline:
+
+ ChannelPipeline p = ...;
+ p.addLast("1", new InboundHandlerA());
+ p.addLast("2", new InboundHandlerB());
+ p.addLast("3", new OutboundHandlerA());
+ p.addLast("4", new OutboundHandlerB());
+ p.addLast("5", new InboundOutboundHandlerX());
+ 
+In the example above, the class whose name starts with Inbound means it is an inbound handler. The class whose name starts with Outbound means it is a outbound handler.
+In the given example configuration, the handler evaluation order is 1, 2, 3, 4, 5 when an event goes inbound. When an event goes outbound, the order is 5, 4, 3, 2, 1. On top of this principle, ChannelPipeline skips the evaluation of certain handlers to shorten the stack depth:
+
+3 and 4 don't implement ChannelInboundHandler, and therefore the actual evaluation order of an inbound event will be: 1, 2, and 5.
+1 and 2 don't implement ChannelOutboundHandler, and therefore the actual evaluation order of a outbound event will be: 5, 4, and 3.
+If 5 implements both ChannelInboundHandler and ChannelOutboundHandler, the evaluation order of an inbound and a outbound event could be 125 and 543 respectively.
+
+
+---------------
+
+Forwarding an event to the next handler
+
+As you might noticed in the diagram shows, a handler has to invoke the event propagation methods in ChannelHandlerContext to forward an event to its next handler. Those methods include:
+Inbound event propagation methods:
+ChannelHandlerContext.fireChannelRegistered()
+ChannelHandlerContext.fireChannelActive()
+ChannelHandlerContext.fireChannelRead(Object)
+ChannelHandlerContext.fireChannelReadComplete()
+ChannelHandlerContext.fireExceptionCaught(Throwable)
+ChannelHandlerContext.fireUserEventTriggered(Object)
+ChannelHandlerContext.fireChannelWritabilityChanged()
+ChannelHandlerContext.fireChannelInactive()
+ChannelHandlerContext.fireChannelUnregistered()
+Outbound event propagation methods:
+ChannelHandlerContext.bind(SocketAddress, ChannelPromise)
+ChannelHandlerContext.connect(SocketAddress, SocketAddress, ChannelPromise)
+ChannelHandlerContext.write(Object, ChannelPromise)
+ChannelHandlerContext.flush()
+ChannelHandlerContext.read()
+ChannelHandlerContext.disconnect(ChannelPromise)
+ChannelHandlerContext.close(ChannelPromise)
+ChannelHandlerContext.deregister(ChannelPromise)
+and the following example shows how the event propagation is usually done:
+ public class MyInboundHandler extends ChannelInboundHandlerAdapter {
+      @Override
+     public void channelActive(ChannelHandlerContext ctx) {
+         System.out.println("Connected!");
+         ctx.fireChannelActive();
+     }
+ }
+
+------------------------------------------------------------
+
 	
 PropertySourcesPlaceholderConfigurer 是spring disconf的？
 
