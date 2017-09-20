@@ -208,6 +208,23 @@ and the following example shows how the event propagation is usually done:
  }
 
 ------------------------------------------------------------
+Thread-local object pool
+If your thread is long-running and you allocate many short-living objects of same type, you can use a thread-local object pool, called Recycler. It reduces the amount of the garbage you produce, saving memory bandwidth consumption and load on the garbage collector.
+
+
+User-extensible enum
+enum is great for a static set of constants, but you cannot extend one. When you need to add more constants in runtime or allow third parties to define additional constants, use the extensible io.netty.util.ConstantPool instead
+
+Thread Affinity
+If you're developing low-latency network applications with Netty, you're probably aware of the thing called thread affinity. Thread affinity can be used to force your application threads to run on a particular CPU core or set of CPUs. 
+
+Notice, to achieve the lowest latency possible you should consider isolating your target CPUs from OS scheduler. Isolating target CPUs will prevent OS scheduler to schedule any other user-space processes on these CPUs. This can be done with isolcpus kernel boot parameter (i.e. add isolcpus=<cpu-list> to grub.conf).
+
+
+
+
+
+------------------------------------------------------------
 
 	
 PropertySourcesPlaceholderConfigurer 是spring disconf的？
