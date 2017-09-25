@@ -1,0 +1,47 @@
+2017-9-18
+
+// operation
+graylog		log monitor tool
+
+zabbix		cpu/memory monitor tool
+
+# batch install tool
+# a layer on top of docker, manage instance 
+
+
+// ER
+
+powerdesigner
+
+
+// RAP api
+http://rapapi.org
+api,及mock
+
+
+
+// 数据库连接池
+druid	扩展性好，支持SQL拦截解析，代码中等
+dbcp	代码简单
+c3p0	代码复杂
+都有jmx监控
+
+
+
+Hystrix
+依赖隔离,防止网络不稳定，依赖出问题，阻塞
+设计模式：命令模式
+超过超时时间，fallback
+为每个依赖提供一个小的线程池，池满了调用会被拒绝
+依赖调用结果分:成功，失败（抛出异常），超时，线程拒绝，短路。 请求失败(异常，拒绝，超时，短路)时执行fallback(降级)逻辑。
+熔断器组件
+提供近实时依赖的统计和监控
+web.xml
+<servlet>
+    <servlet-name>HystrixMetricsStreamServlet</servlet-name>
+    <servlet-class>com.netflix.hystrix.contrib.metrics.eventstream.HystrixMetricsStreamServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>HystrixMetricsStreamServlet</servlet-name>
+    <url-pattern>/hystrix.stream</url-pattern>
+  </servlet-mapping>

@@ -4,3 +4,85 @@ sleep 2
 git pull
 nohup java -Djava.io.tmpdir=/var/tmp -Dfile.encoding=UTF-8 -server -Xmx512m -Xms512m -Xmn128m -XX:PermSize=64m -Xss256k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 -XX:+CMSClassUnloadingEnabled -XX:+AggressiveOpts -XX:+UseFastAccessorMethods  -jar aui.pluginServer-0.0.1-SNAPSHOT.jar &
 
+
+
+
+
+
+-XX:+UseConcMarkSweepGC
+CMS(Concurrent Mark-Sweep)是以牺牲吞吐量为代价来获得最短回收停顿时间的垃圾回收器。
+
+
+
+
+-Xms	初始堆大小。如：-Xms256m
+-Xmx	最大堆大小。如：-Xmx512m
+-Xmn	新生代大小。通常为 Xmx 的 1/3 或 1/4。新生代 = Eden + 2 个 Survivor 空间。实际可用空间为 = Eden + 1 个 Survivor，即 90% 
+-Xss	JDK1.5+ 每个线程堆栈大小为 1M，一般来说如果栈不是很深的话， 1M 是绝对够用了的。
+-XX:NewRatio	新生代与老年代的比例，如 –XX:NewRatio=2，则新生代占整个堆空间的1/3，老年代占2/3
+-XX:SurvivorRatio	新生代中 Eden 与 Survivor 的比值。默认值为 8。即 Eden 占新生代空间的 8/10，另外两个 Survivor 各占 1/10 
+-XX:PermSize	永久代(方法区)的初始大小
+-XX:MaxPermSize	永久代(方法区)的最大值
+-XX:+PrintGCDetails	打印 GC 信息
+-XX:+HeapDumpOnOutOfMemoryError	让虚拟机在发生内存溢出时 Dump 出当前的内存堆转储快照，以便分析用
+
+
+
+
+-Xms :初始堆大小  
+-Xmx :最大堆大小  
+-XX:NewSize=n :设置年轻代大小  
+-XX:NewRatio=n: 设置年轻代和年老代的比值。如:为3，表示年轻代与年老代比值为1：3，年轻代占整个年轻代年老代和的1/4  
+-XX:SurvivorRatio=n :年轻代中Eden区与两个Survivor区的比值。注意Survivor区有两个。如：3，表示Eden：Survivor=3：2，一个Survivor区占整个年轻代的1/5 
+-XX:MaxPermSize=n :设置持久代大小  
+收集器设置  
+-XX:+UseSerialGC :设置串行收集器  
+-XX:+UseParallelGC :设置并行收集器  
+-XX:+UseParalledlOldGC :设置并行年老代收集器  
+-XX:+UseConcMarkSweepGC :设置并发收集器  
+垃圾回收统计信息  
+-XX:+PrintHeapAtGC GC的heap详情 
+-XX:+PrintGCDetails  GC详情 
+-XX:+PrintGCTimeStamps  打印GC时间信息 
+-XX:+PrintTenuringDistribution    打印年龄信息等
+-XX:+HandlePromotionFailure   老年代分配担保（true  or false）
+并行收集器设置  
+-XX:ParallelGCThreads=n :设置并行收集器收集时使用的CPU数。并行收集线程数。  
+-XX:MaxGCPauseMillis=n :设置并行收集最大暂停时间  
+-XX:GCTimeRatio=n :设置垃圾回收时间占程序运行时间的百分比。公式为1/(1+n)  
+并发收集器设置  
+-XX:+CMSIncrementalMode :设置为增量模式。适用于单CPU情况。  
+-XX:ParallelGCThreads=n :设置并发收集器年轻代收集方式为并行收集时，使用的CPU数。并行收集线程数。
+
+
+-XX:+DisableExplicitGC	关闭System.gc()	 	这个参数需要严格的测试
+-XX:+CMSParallelRemarkEnabled	降低标记停顿
+-XX+UseCMSCompactAtFullCollection	在FULL GC的时候， 对年老代的压缩	 	CMS是不会移动内存的， 因此， 这个非常容易产生碎片， 导致内存不够用， 因此， 内存的压缩这个时候就会被启用。 增加这个参数是个好习惯。
+可能会影响性能,但是可以消除碎片
+-XX:+UseFastAccessorMethods	原始类型的快速优化	 
+-XX:+UseCMSInitiatingOccupancyOnly	使用手动定义初始化定义开始CMS收集	 	禁止hostspot自行触发CMS GC	 
+-XX:CMSInitiatingOccupancyFraction=70	使用cms作为垃圾回收
+使用70％后开始CMS收集	92	为了保证不出现promotion failed(见下面介绍)错误,该值的设置需要满足以下公式CMSInitiatingOccupancyFraction计算公式
+-XX:+CMSClassUnloadingEnabled	相对于并行收集器，CMS收集器默认不会对永久代进行垃圾回收。如果希望对永久代进行垃圾回收，可用设置标志-XX:+CMSClassUnloadingEnabled。在早期JVM版本中，要求设置额外的标志-XX:+CMSPermGenSweepingEnabled。注意，即使没有设置这个标志，一旦永久代耗尽空间也会尝试进行垃圾回收，但是收集不会是并行的，而再一次进行Full GC。
+-XX:+AggressiveOpts	加快编译
+
+
+
+------------CMSInitiatingOccupancyFraction计算公式------------
+CMSInitiatingOccupancyFraction值与Xmn的关系公式
+
+上面介绍了promontion faild产生的原因是EDEN空间不足的情况下将EDEN与From survivor中的存活对象存入To survivor区时,To survivor区的空间不足，再次晋升到old gen区，而old gen区内存也不够的情况下产生了promontion faild从而导致full gc.那可以推断出：eden+from survivor < old gen区剩余内存时，不会出现promontion faild的情况，即：
+(Xmx-Xmn)*(1-CMSInitiatingOccupancyFraction/100)>=(Xmn-Xmn/(SurvivorRatior+2))  进而推断出：
+
+CMSInitiatingOccupancyFraction <=((Xmx-Xmn)-(Xmn-Xmn/(SurvivorRatior+2)))/(Xmx-Xmn)*100
+
+例如：
+
+当xmx=128 xmn=36 SurvivorRatior=1时 CMSInitiatingOccupancyFraction<=((128.0-36)-(36-36/(1+2)))/(128-36)*100 =73.913
+
+当xmx=128 xmn=24 SurvivorRatior=1时 CMSInitiatingOccupancyFraction<=((128.0-24)-(24-24/(1+2)))/(128-24)*100=84.615…
+
+当xmx=3000 xmn=600 SurvivorRatior=1时  CMSInitiatingOccupancyFraction<=((3000.0-600)-(600-600/(1+2)))/(3000-600)*100=83.33
+
+CMSInitiatingOccupancyFraction低于70% 需要调整xmn或SurvivorRatior值。
+----------------------------

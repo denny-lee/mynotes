@@ -1,0 +1,73 @@
+使用jsp
+依赖
+<dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>${servlet.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>javax.servlet.jsp</groupId>
+        <artifactId>jsp-api</artifactId>
+        <version>${jsp-api.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <!-- web页面 -->
+      <dependency>
+        <groupId>taglibs</groupId>
+        <artifactId>standard</artifactId>
+        <version>${taglibs.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>jstl</groupId>
+        <artifactId>jstl</artifactId>
+        <version>${jstl.version}</version>
+      </dependency>
+	  
+	  
+	  
+否则直接访问.jsp页面不会编译，直接显示了本文
+
+要想不通过action直接访问jsp，加配置
+<mvc:default-servlet-handler/>
+
+异常信息跳转到jsp:
+<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="defaultErrorView" value="/errorPage/400.jsp" />
+    </bean>
+	
+400.jsp:
+<%@ page import="com.xinguang.tubobo.launcher.api.entity.RespWrapper" %>
+<%@ page import="com.alibaba.fastjson.JSONObject" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+         pageEncoding="UTF-8" isErrorPage="true"%>
+<%
+    RespWrapper<String> resp = new RespWrapper<String>("1", "参数错误");
+    if (exception != null) {
+        resp.setResultDesc(exception.getMessage());
+    }
+    String json = JSONObject.toJSONString(resp);
+%>
+<%=json%>
+
+
+web.xml配置：路径相对于webapp
+<error-page>
+    <error-code>400</error-code>
+    <location>/errorPage/400.jsp</location>
+  </error-page>
+  
+  
+
+
+
+
+
+InternalResourceViewResolver不是必须的
+<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/"/>
+        <property name="suffix" value=".jsp"/>
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+        <property name="order" value="1" />
+    </bean>
+	
