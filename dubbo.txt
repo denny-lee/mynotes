@@ -1,0 +1,11 @@
+2017-9-26
+dubbo接口定义：
+加extends Serializable
+且有static final变量时，在使用zookeeper时会导致消费者无法找到可用状态的服务。
+Forbid consumer 192.168.1.101 access service service.DemoService from registry 127.0.0.1:2181 use dubbo version 2.8.4, Please check registry access list (whitelist/blacklist).
+Failed to check the status of the service，No provider available for the service
+
+但是从控制台，看dubbo服务是正常的。
+
+
+不使用zk而用，<dubbo:registry address="multicast://224.5.6.7:1234"/>时不存在此问题，可以正常调用dubbo服务。
