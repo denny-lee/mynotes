@@ -680,3 +680,25 @@ Activation：在哪种情况下使用
 
 在jar包冲突的情况下，可以查看依赖树，排除冲突
 mvn dependency:tree
+
+
+
+======================================
+把一个工程创建成为模板：
+1. prepare a maven project
+4
+1. execute   
+5
+`mvn -DdefaultEncoding=utf-8 -Darchetype.filteredExtensions=java archetype:create-from-project`
+6
+1. install   
+7
+`cd target/generated-sources/archetype/`   
+8
+`mvn install`
+9
+1. use it   
+10
+`cd /tmp/archetype/`   
+11
+`mvn archetype:generate -DarchetypeCatalog=local`
