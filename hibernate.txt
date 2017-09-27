@@ -1,0 +1,2 @@
+Hibernate加索引
+@Table(name = "tbb_order_status", indexes = {@Index(name = "idx_order_status_retrytimes", columnList = "retryTimes"), @Index(name = "idx_order_status_pushed", columnList = "pushed")})
