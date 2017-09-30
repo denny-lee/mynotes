@@ -1,0 +1,75 @@
+acknowledgment 很重要
+不然当client断开了，服务不知道，因此不会释放内存
+
+
+durability=true
+当服务停了，消息依然在
+但这个是week persistence guarantee
+当mq收到消息，只在cache中，但还没有来得及存到disk时，服务停了。。。
+
+
+Fair dispatch公平
+在消费端：
+int prefetchCount = 1;
+channel.basicQos(prefetchCount);
+这样，每次会分一个消息给消费者，直到它上一个消息processed and acknowledged
+会分给其他空闲的消费者
+
+
+Publish/Subscribe
+--------------------
+四种exchange:
+direct, topic, headers and fanout
+
+fanout发到所有已知队列，即使你用了bindingKey也会被忽略
+channel.exchangeDeclare("logs", "fanout");
+channel.basicPublish( "logs", "", null, message.getBytes());
+
+
+Temporary queues	在启动时重新创建，关闭时自动删除的队列。
+String queueName = channel.queueDeclare().getQueue();
+channel.queueBind(queueName, "logs", "");
+
+java的例子，P能启动成功，但C启动报错，
+Caused by: com.rabbitmq.client.ShutdownSignalException: channel error; protocol method: #method<channel.close>(reply-code=404, reply-text=NOT_FOUND - no exchange 'amq.gen-uDxoJHgvqNp1OjsBbj7ebg' in vhost 'test', class-id=40, method-id=30)
+
+结果P用java, C用python是可以的
+
+----------------------------------------
+Routing
+
+direct
+这种，完全匹配bindingKey才会
+可以多key绑一个，也可以一key绑多个queue
+
+
+----------------------------------------
+Topic
+.分隔的多个字
+255字节限制
+* (star) can substitute for exactly one word.
+# (hash) can substitute for zero or more words.
+
+
+----------------------------------------
+RPC
+import com.rabbitmq.client.AMQP.BasicProperties;
+callbackQueueName = channel.queueDeclare().getQueue();
+
+BasicProperties props = new BasicProperties
+                            .Builder()
+                            .replyTo(callbackQueueName)
+                            .build();
+
+channel.basicPublish("", "rpc_queue", props, message.getBytes());
+
+deliveryMode: Marks a message as persistent (with a value of 2) or transient (any other value). You may remember this property from the second tutorial.
+contentType: Used to describe the mime-type of the encoding. For example for the often used JSON encoding it is a good practice to set this property to: application/json.
+replyTo: Commonly used to name a callback queue.
+correlationId: Useful to correlate RPC responses with requests.
+
+使用correlationId，不用为每个rpc的回应单独建一个队列，节约资源
+
+RPC的server端为了分散负载加上prefetchCount设置
+We might want to run more than one server process. In order to spread the load equally over multiple servers we need to set the  prefetchCount setting in channel.basicQos.
+
