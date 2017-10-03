@@ -1,0 +1,2 @@
+use jenkins shell start tomcat fail:
+cause jenkins will kill all its decendant ps after executed all shell command.
