@@ -1,5 +1,10 @@
 2017-9-18
 
+// 权限
+shiro
+
+
+
 // operation
 graylog		log monitor tool
 
@@ -53,3 +58,6 @@ web.xml
   </servlet-mapping>
   
   
+
+// 设计 
+Axure RP Extension for chrome
