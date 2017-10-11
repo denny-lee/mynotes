@@ -38,6 +38,9 @@ c3p0	代码复杂
 // config
 disconf
 
+spring的cache+redis
+
+
 
 Hystrix
 依赖隔离,防止网络不稳定，依赖出问题，阻塞
