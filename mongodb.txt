@@ -1,3 +1,38 @@
+mongo新增用户：
+ db.createUser({user:"test",pwd:"test",roles:[{role:"readWrite",db:"liwtest"}]})
+注意，这条指令指定了db的角色，但连接时只能用test这个db做auth.不然没权限
+
+对应的项目里，credentail也必须是用test库，但morphia可以是其它的库
+
+Group查询，可以使用AggregationPipeline.注意必须要有个ID
+如果有日期，需要按不同精度来group的，可以先用Projection投射，来把日期处理成相应精度。再group
+
+Datastore ds = dao.getDatastore();
+        Query<Object> q = ds.getQueryFactory().createQuery(ds);
+        BasicDBObject fmt = new BasicDBObject();
+        fmt.append("format", "%Y-%m-%d");
+        fmt.append("date", "$createGmt");
+        Projection func = expression("$dateToString", fmt);
+        AggregationPipeline pipeline = ds.createAggregation(Teacher.class).project(projection("newDate", func))
+                .group(
+                        id(grouping("newDate")),
+                        grouping("count", new Accumulator("$sum", 1)),
+                        grouping("totalAge", sum("age"))
+                )
+                .sort(Sort.ascending("count"));
+        Iterator<Group> it = pipeline.aggregate(Group.class);
+        int i = 0;
+        while (it.hasNext()) {
+            Group g = it.next();
+            System.out.println(g);
+            i++;
+        }
+        System.out.println("document count: "+ i);
+		
+
+
+
+
 Mongo事务方案：
 
 解决方案1：字段同步
