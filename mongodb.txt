@@ -1,3 +1,12 @@
+mongodb服务后台启动：
+./mongod --dbpath /home/liwtest/mongodb-linux-x86_64-rhel70-3.4.9/db/ --fork --logpath /home/liwtest/mongodb-linux-x86_64-rhel70-3.4.9/logs/mongo.log
+
+
+
+
+
+
+
 mongo新增用户：
  db.createUser({user:"test",pwd:"test",roles:[{role:"readWrite",db:"liwtest"}]})
 注意，这条指令指定了db的角色，但连接时只能用test这个db做auth.不然没权限
@@ -30,8 +39,26 @@ Datastore ds = dao.getDatastore();
         System.out.println("document count: "+ i);
 		
 
+		
+导入、导出
+mongoexport -h 172.16.1.91 -d test -c AddressInfoEntity -o D:\test.json
+mongoexport -h 172.16.1.91 -d test -c AddressInfoEntity -o D:\test.json --pretty
+
+mongoexport -h 172.16.1.91 -d test -c AddressInfoEntity -o D:\test.json
+mongoexport -h 172.16.1.91:27017 -u user -p "pass" -d test -c AddressInfoEntity -o D:\test.json
+mongoimport -h 172.16.1.91 -d test -c AddressInfoEntity --file D:\test.json
+ 
+强制扫描，两种情况 
+--forceTableScan¶
+Forces mongoexport to scan the data store directly instead of traversing the _id field index. Use --forceTableScan to skip the index. Typically there are two cases where this behavior is preferable to the default:
+
+If you have key sizes over 800 bytes that would not be present in the _id index.
+Your database uses a custom _id field.
 
 
+
+取出ref的值使用fetch
+db.getCollection('AppointTaskEntity').find({_id:"04869c33e8184c9bbc4bd7a1525462d0"})[0].store.fetch().service.fetch();
 
 Mongo事务方案：
 
