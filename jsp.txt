@@ -31,10 +31,19 @@
 要想不通过action直接访问jsp，加配置
 <mvc:default-servlet-handler/>
 
-异常信息跳转到jsp:
+异常信息跳转到jsp: 以下配置，jsp页面放到webapp/errorPage/400.jsp
 <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
-        <property name="defaultErrorView" value="/errorPage/400.jsp" />
+        <property name="defaultErrorView" value="/400" />
     </bean>
+
+	<bean id="jspViewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+        <property name="prefix" value="/errorPage" />
+        <property name="suffix" value=".jsp" />
+    </bean>
+	
+	
 	
 400.jsp:
 <%@ page import="com.xinguang.tubobo.launcher.api.entity.RespWrapper" %>
