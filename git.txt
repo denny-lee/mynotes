@@ -145,3 +145,7 @@ git checkout a1f36d -- filename
 -----------------------------
 关联远程分支
 git branch --set-upstream-to=origin/<branch>  <branch> 关联远程分支
+
+
+--------------------
+git删除远程分支
