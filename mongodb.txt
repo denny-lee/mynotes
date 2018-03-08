@@ -41,12 +41,17 @@ Datastore ds = dao.getDatastore();
 
 		
 导入、导出
+mongodump -h 172.16.1.99:27017 -d tbbexpress -o D:\db\
 mongoexport -h 172.16.1.91 -d test -c AddressInfoEntity -o D:\test.json
 mongoexport -h 172.16.1.91 -d test -c AddressInfoEntity -o D:\test.json --pretty
 
 mongoexport -h 172.16.1.91 -d test -c AddressInfoEntity -o D:\test.json
 mongoexport -h 172.16.1.91:27017 -u user -p "pass" -d test -c AddressInfoEntity -o D:\test.json
 mongoimport -h 172.16.1.91 -d test -c AddressInfoEntity --file D:\test.json
+
+
+./mongorestore -h 127.0.0.1 -d expressDev --dir ../data_ex/mongo_express_dev/
+
  
 强制扫描，两种情况 
 --forceTableScan¶

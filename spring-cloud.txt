@@ -1,0 +1,148 @@
+spring cloud projects:
+register:
+zookeeper
+	注册服务要配置
+spring:
+  application:
+    name: store
+  cloud:
+    zookeeper:
+      connect-string: 172.16.2.182:2181,172.16.2.183:2181
+
+loadBalancerType
+STICKY - once chosen the instance will always be called
+RANDOM - picks an instance randomly
+ROUND_ROBIN - iterates over instances over and over again 默认
+
+
+boot service:
+petservice  ----2 instance
+buyer
+
+
+
+feign:
+注意，Fiegn + Zookeeper + Ribbon
+Fiegn服务生产方要加使 服务注册configuration, 注意需要 appName, ip, port
+要Feign消费方要加@EnableDiscoveryClient
+否则客户端报 ribbonServerList 空指针
+
+zuul:
+
+
+ribbon:
+Feign自带
+
+hystrix:
+feign自带，
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-hystrix</artifactId>
+		</dependency>
+		如果带上/hystrix.stream 加：
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		如果要可视化看板
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-hystrix-dashboard</artifactId>
+		</dependency>
+注意，hystrix服务要加@EnableCircuitBreaker，或@EnableHystrix
+否则看板报：Unable to connect to Command Metric Stream.
+
+turbin
+要加上hystrix依赖，及注解@EnableHystrix和@EnableTurbine
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-hystrix</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-turbine</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.cloud</groupId>
+					<artifactId>spring-cloud-starter-eureka</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+By default, Turbine looks for the /hystrix.stream endpoint on a registered instance by looking up its homePageUrl entry in Eureka, then appending /hystrix.stream to it. This means that if spring-boot-actuator is running on its own port (which is the default), the call to /hystrix.stream will fail. To make turbine find the Hystrix stream at the correct port, you need to add management.port to the instances' metadata:
+eureka:
+  instance:
+    metadata-map:
+      management.port: ${management.port:8081}
+
+	  
+application.yml
+spring.application.name: turbine
+server.port: 8080
+InstanceDiscovery.impl: com.netflix.turbine.discovery.ConfigPropertyBasedDiscovery
+turbine:
+#  combineHostPort: false
+  appConfig: buyer,store
+  clusterNameExpression: "'default'"
+#  instanceUrlSuffix: :8088/hystrix.stream
+eureka:
+  client.register-with-eureka: false
+  client.fetch-registry: false
+spring:
+  cloud:
+    zookeeper:
+      connect-string: 172.16.2.182:2181,172.16.2.183:2181
+	  
+	  
+
+	  
+
+Sleuth:
+引入
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-sleuth</artifactId>
+		</dependency>
+开日志org.springframework.web.servlet.DispatcherServlet: DEBUG 就可以看到了。
+使用zipkin收集
+各端要再引入
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-sleuth-stream</artifactId>
+		</dependency>
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-stream-binder-rabbit</artifactId>
+		</dependency>
+收集器引入
+<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-sleuth-zipkin-stream</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-sleuth</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.zipkin.java</groupId>
+			<artifactId>zipkin-autoconfigure-ui</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-stream-binder-rabbit</artifactId>
+		</dependency>
+		
+
+bus:
+
+
+stream:
+
+
+-----------------------------------------
+jpa auditing来处理分片的问题

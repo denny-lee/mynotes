@@ -702,3 +702,11 @@ mvn dependency:tree
 `cd /tmp/archetype/`   
 11
 `mvn archetype:generate -DarchetypeCatalog=local`
+
+
+------------------------------------
+jar包上传到私服
+
+mvn deploy:deploy-file -DgroupId=com.taobao.pac -DartifactId=pac.sdk.cp -Dversion=4.0.81 -Dpackaging=jar -Dfile=D:\mission\thirdpart_jar\pac.sdk.cp-4.0.81.jar -Durl=http://maven.ops.com/nexus/content/repositories/thirdparty/ -DrepositoryId=thirdparty
+
+mvn deploy:deploy-file -DgroupId=com.taobao.pac -DartifactId=pac.sdk.cp -Dversion=4.0.81-SNAPSHOT -Dpackaging=jar -Dfile=D:\mission\thirdpart_jar\pac.sdk.cp-4.0.81.jar -Durl=http://maven.ops.com/nexus/content/repositories/snapshots/ -DrepositoryId=snapshots

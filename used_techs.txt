@@ -68,3 +68,10 @@ web.xml
 
 // 设计 
 Axure RP Extension for chrome
+
+
+
+// 分布式应用
+wro, wro4j.是为了提高Java Web前端的性能而出现的技术，简单来说它的功能就是压缩(processor)和组合文件(group)，减少文件传输次数和大小。
+OAUTH2.0
+spring cloud zk disconf
