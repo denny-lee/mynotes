@@ -1,0 +1,10 @@
+常用命令：
+$ echo ruok | nc 127.0.0.1 5111
+cons 列表
+dump 列表
+envi 环境
+srvr 服务以及是否是leader
+stat 
+wchs watches列表
+wchc watches列表（详细）by session
+wchp watches列表（详细）by path
