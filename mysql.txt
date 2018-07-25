@@ -22,3 +22,16 @@ mysqld
 mysql -u root
 
 关闭服务：mysqladmin -u root -p shutdown
+
+
+--------------
+root可以被外部访问
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root' WITH GRANT OPTION;
+flush privileges;
+select host,user from user;
+
+----------------------------
+设置事务隔离级别
+查看
+SELECT @@tx_isolation;
+设置：

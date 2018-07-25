@@ -146,3 +146,21 @@ stream:
 
 -----------------------------------------
 jpa auditing来处理分片的问题
+
+
+--------------------------------------------------
+hystrix使用：
+应用Application 中
+@EnableHystrix
+就可以访问：应用地址/hystrix.stream了
+在hystrix看板服务中加配置
+@EnableHystrixDashboard
+@EnableTurbineStream
+application.yml中加：
+turbine:
+  appConfig: callback-server,merchant-manage,searchgoods,xgusercenter,account-center,ordercenter,axe1,tubobo-bdtools,axe,shopper,goodscenter,service,operation-manage-supplychain,checkout-stand,zipkin-server,operation-manage,gateway
+  aggregator:
+    clusterConfig: default
+  clusterNameExpression: new String("default")
+  
+访问应用地址/hystrix

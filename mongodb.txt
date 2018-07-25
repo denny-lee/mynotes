@@ -8,7 +8,7 @@ mongodb服务后台启动：
 
 
 mongo新增用户：
- db.createUser({user:"test",pwd:"test",roles:[{role:"readWrite",db:"liwtest"}]})
+ db.createUser({user:"liwtest",pwd:"liwtest",roles:[{role:"readWrite",db:"liwtest"}]})
 注意，这条指令指定了db的角色，但连接时只能用test这个db做auth.不然没权限
 
 对应的项目里，credentail也必须是用test库，但morphia可以是其它的库
