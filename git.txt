@@ -176,3 +176,15 @@ git log --pretty='%aN' | sort -u | wc -l
 git log --oneline | wc -l 
 添加或修改的代码行数：
 git log --stat|perl -ne 'END { print $c } $c += $1 if /(\d+) insertions/;
+
+------------config proxy-----------------
+git config --global http.proxy http://10.248.192.245:80
+git config --global --unset http.proxy
+
+------------modify remote url------------------
+git remote -v
+git remote set-url origin git@github.com:USERNAME/REPOSITORY.git
+
+------------clear cached local user------------
+git config --system --unset credential.helper
+git config --global --unset credential.helper

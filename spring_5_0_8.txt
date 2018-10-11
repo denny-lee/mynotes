@@ -1,0 +1,88 @@
+2018.08.31
+
+AnnotationConfigApplicationContext
+	reader
+		createEnvironment
+		instantiate ConditionEvaluator
+		registerAnnotationConfigProcessors
+			setComparator and Resolver to Context(BeenFactory)
+			Add some RootBeanDefination to BeanDefinitionHolder set
+			
+	scanner
+		add AnnotationTypeFilter of Component.class
+		add AnnotationTypeFilter of javax.annotation.ManagedBean
+		add AnnotationTypeFilter of javax.inject.Named
+		setEnvironment
+		setResourceLoader
+			instantiate PathMatchingResourcePatternResolver
+			instantiate CachingMetadataReaderFactory
+				because context is a DefaultResourceLoader, set Cache and put MetadataReader.class as key , an Empty ConcurrentHashMap as a value. Cache is a LinkedHashMap<Resource, Map>
+			put ClassLoader into Cache
+			
+	regist bean
+		instantiate AnnotatedGenericBeanDefinition of the class
+		instantiate BeanDefinitionHolder
+		regist beanDefination
+		
+	refresh()	-- AbstractApplicationContext
+		prepareRefresh
+			validateRequiredProperties
+		refreshBeanFactory()
+		prepareBeanFactory
+			set classLoader
+			set spel Expression resolver
+			ignore some special interfaces. like EnvironmentAware EmbeddedValueResolverAware ResourceLoaderAware ApplicationEventPublisherAware MessageSourceAware ApplicationContextAware
+		postProcessBeanFactory	empty
+		invokeBeanFactoryPostProcessors
+			PostProcessorRegistrationDelegate.invokeBeanFactoryPostProcessors
+				beanFactory.getBean(ppName, BeanDefinitionRegistryPostProcessor.class)
+					doGetBean() -- AbstractBeanFactory
+						getSingleton(beanName, ObjectFactory)
+							createBean() -- AbstractAutowireCapableBeanFactory
+								doCreateBean()
+									instantiate() -- SimpleInstantiationStrategy
+										BeanUtils.instantiateClass(constructorToUse)
+										
+				invoke postprocessors in order
+					sortPostProcessors
+					registryProcessors
+					invokeBeanDefinitionRegistryPostProcessors
+				beanFactory.clearMetadataCache();
+			if LoadTimeWeaver is configed, then 
+				add special processor for this
+				set a special ClassLoader to beanFactory
+				
+			processConfigBeanDefinitions -- ConfigurationClassPostProcessor
+				parse -- ConfigurationClassParser
+					doProcessConfigurationClass
+						processMemberClasses	nested class first
+							
+		registerBeanPostProcessors
+			regist some processors that intercept bean creation
+			ApplicationListenerDetector is last one to regist
+		initMessageSource		AbstractApplicationContext is a implementation of MessageSource
+		initApplicationEventMulticaster		regist ApplicationEventMulticaster as singleton
+		onRefresh()		do nothing by default.
+		registerListeners()		fisrt, regist this.applicationListeners, then, regist all ApplicationListener.class, last regist this.earlyApplicationEvents
+		finishBeanFactoryInitialization()
+			setConversionService() for convert Object to class.
+			Initialize LoadTimeWeaverAware.class
+			setTempClassLoader(null);
+			freezeConfiguration();		so there will no further changes for caching.
+			preInstantiateSingletons();
+		finishRefresh()
+			clear cache.
+			initLifecycleProcessor();
+			start lifecircle processor
+			publish a ContextRefreshedEvent
+			set applicationContext to LiveBeansView, and start a mbean.
+			
+		resetCommonCaches()		clear all caches
+		
+		
+-----------------------------------
+
+org.springframework.context.annotation.internalCommonAnnotationProcessor
+
+
+		
