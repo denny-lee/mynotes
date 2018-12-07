@@ -69,7 +69,7 @@ AnnotationConfigApplicationContext
 			Initialize LoadTimeWeaverAware.class
 			setTempClassLoader(null);
 			freezeConfiguration();		so there will no further changes for caching.
-			preInstantiateSingletons();
+			preInstantiateSingletons();		instantiate Singleton beans
 		finishRefresh()
 			clear cache.
 			initLifecycleProcessor();
@@ -80,9 +80,25 @@ AnnotationConfigApplicationContext
 		resetCommonCaches()		clear all caches
 		
 		
------------------------------------
 
-org.springframework.context.annotation.internalCommonAnnotationProcessor
+---instantiate Singleton beans--
+
+BeanUtils.instantiateClass
 
 
-		
+AbstractApplicationContext.java
+finishBeanFactoryInitialization
+	DefaultListableBeanFactory.java
+	preInstantiateSingletons
+		AbstractBeanFactory.java
+		getBean
+		doGetBean
+			DefaultSingletonBeanRegistry.java
+			getSingleton.getObject()
+				AbstractAutowiredCapableBeanFactory.java
+				createBean
+				doCreateBean
+				createBeanInstance
+				instantiateBean
+					SimpleInstantiationStrategy.java
+					instantiate

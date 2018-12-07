@@ -1,0 +1,15 @@
+2018.10.17
+
+javax.servlet.ServletContextListener	interface of servlet
+
+ContextLoaderListener	implements ServletContextListener
+	contextInitialized(ServletContextEvent event)
+	contextDestroyed(ServletContextEvent event)
+	
+ContextLoader
+	initWebApplicationContext
+		create a WebApplicationContext
+		configureAndRefreshWebApplicationContext
+		put WebApplicationContext into a map(key: currentThread ClassLoader)
+		
+		

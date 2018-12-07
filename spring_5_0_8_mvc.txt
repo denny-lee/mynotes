@@ -1,0 +1,27 @@
+2018.10.17
+
+DispatcherServlet	extends FrameworkServlet extends HttpServletBean extends HttpServlet
+
+create beanfactory with different serial Id but same classloader.
+
+		
+		
+servlet and listener maintain different WebApplicationContext.
+Listener's:
+null parent.
+
+Servlet:
+has ServletContext and with parent of Listener's WAC
+
+And:
+Add injected beans maintained by Listener's WAC into  externallyManagedConfigMembers of RootBeanDefinations.
+
+
+AutowiredAnnotationBeanPostProcessor
+postProcessPropertyValues
+
+InjectMatedata
+inject
+
+
+

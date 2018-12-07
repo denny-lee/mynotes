@@ -86,3 +86,10 @@ CMSInitiatingOccupancyFraction <=((Xmx-Xmn)-(Xmn-Xmn/(SurvivorRatior+2)))/(Xmx-X
 
 CMSInitiatingOccupancyFraction低于70% 需要调整xmn或SurvivorRatior值。
 ----------------------------
+
+-XX:OnOutOfMemoryError=chmod 744 *.hprof -XX:+HeapDumpOnOutOfMemoryError		OOM printStack
+-XX:-PrintGCDetails -XX:-PrintGCTimeStamps -Xloggc:gc.out 			print GC log
+
+
+java -cp /usr/local/ccms/security/jclass/pwm/PwMatrix.jar:/usr/local/web/mow/runtime/lib:/usr/local/web/mow/runtime/lib/helium-network-process.jar -XX:-PrintGCDetails -XX:-PrintGCTimeStamps -Xloggc:gc.out -XX:OnOutOfMemoryError=chmod 744 *.hprof -Xms512m -Xmx2048m -Xss1m -XX:+HeapDumpOnOutOfMemoryError -Dhelium.client=ori -Dhelium.hostname=gdcpl3976 -Dhelium.instance=0 -Doracle.net.disableOob=true com.ssc.helium.netprocess.NetProcessMain http://esp-prod1-code.statestr.com:5506/ori/code/esp-mq-listener-process.xml
+
