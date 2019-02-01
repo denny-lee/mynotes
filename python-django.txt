@@ -1,0 +1,25 @@
+Python - Django:
+
+install Python with pip
+install virtualenv:
+pip --proxy=10.248.192.245 install virtualenv
+install Django:
+pip --proxy=10.248.192.245 install Django==2.1.4
+
+
+----------
+create a virtualenv:
+virtualenv --system-site-packages --no-download env1
+cd env1/Scripts
+activate / deactivate
+----------
+
+craete a django site:
+django-admin startproject mysite
+
+create a django app:
+python manage.py startapp word_dict
+
+
+run server:
+python manage.py runserver
